@@ -5,3 +5,11 @@ controllers:
 kernel:
     resource: ../src/Kernel.php
     type: annotation
+
+
+authentication_token:
+    path: /auth/login
+    methods: ["POST"]
+gesdinet_jwt_refresh_token:
+    path: /auth/refresh_token
+    methods: ["POST"]

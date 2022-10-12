@@ -15,6 +15,7 @@ RUN apk add --no-cache \
 		acl \
 		fcgi \
 		file \
+		supervisor \
 		gettext \
 		git \
 	;
@@ -81,7 +82,7 @@ WORKDIR /srv/api
 ARG APP_ENV=prod
 
 # prevent the reinstallation of vendors at every changes in the source code
-COPY composer.json composer.lock symfony.lock ./
+COPY composer.* symfony.lock ./
 RUN set -eux; \
 	composer install --prefer-dist --no-dev --no-scripts --no-progress; \
 	composer clear-cache
@@ -102,6 +103,17 @@ RUN set -eux; \
 	composer run-script --no-dev post-install-cmd; \
 	chmod +x bin/console; sync
 VOLUME /srv/api/var
+
+# Copy cronjob file
+COPY docker/php/cronjob /etc/cron.d/app-cron
+# Give execution rights on the cron job
+RUN chmod 0644 /etc/cron.d/app-cron
+# Apply cron job
+RUN crontab /etc/cron.d/app-cron
+RUN touch /var/log/cron.log
+
+COPY docker/php/supervisor.d/messenger-worker.ini /etc/supervisor.d/messenger-worker.ini
+COPY docker/php/supervisord.conf /etc/supervisord.conf
 
 COPY docker/php/docker-healthcheck.sh /usr/local/bin/docker-healthcheck
 RUN chmod +x /usr/local/bin/docker-healthcheck

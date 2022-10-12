@@ -13,3 +13,5 @@ api_platform:
         stateless: true
         cache_headers:
             vary: ['Content-Type', 'Authorization', 'Origin']
+        pagination_items_per_page: 100
+        pagination_client_items_per_page: true

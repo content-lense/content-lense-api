@@ -10,6 +10,8 @@ services:
       - ./api/var:/srv/api/var:rw
     environment:
       APP_ENV: dev
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   caddy:
     volumes:

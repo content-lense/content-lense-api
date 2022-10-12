@@ -11,6 +11,8 @@ services:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
+    App\Controller\ConfirmSignupController:
+        public: true
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
     App\:
@@ -21,5 +23,24 @@ services:
             - '../src/Kernel.php'
             - '../src/Tests/'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    #App\ApiPlatform\AutoGroupResourceMetadataFactory:
+        #decorates: "api_platform.metadata.resource.metadata_collection_factory"
+        #decoration_priority: -15
+        #arguments:
+        #    [
+        #        '@App\ApiPlatform\AutoGroupResourceMetadataFactory.inner',
+        #        "@security.token_storage",
+        #    ]
+            
+    #App\Serializer\AddIdFieldNormalizer:
+    #    tags:
+    #        - { name: "serializer.normalizer", priority: 64 }
+
+    # For more info see: https://stackoverflow.com/questions/51281168/how-to-globally-define-configuration-of-serializer-used-in-api-platform
+    App\Serializer\AutoGroupContextBuilder:
+        decorates: "api_platform.serializer.context_builder"
+        autoconfigure: false
+        autowire: true
+    App\State\ArticleProcessor:
+        bind:
+            $decorated: '@api_platform.doctrine.orm.state.persist_processor'

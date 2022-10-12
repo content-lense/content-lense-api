@@ -1,0 +1,3 @@
+#
+##
+#* * * * * /usr/local/bin/php /srv/api/bin/console vs:fetch-posts 2>&1
