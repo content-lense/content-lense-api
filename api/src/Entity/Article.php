@@ -23,6 +23,18 @@ class Article
     const USER_READ = ["user:article:collection:get", "user:article:item:get"];
     const USER_POST = ["user:article:collection:post"];
 
+
+    #[ORM\PreUpdate]
+    #[ORM\PrePersist]
+    public function updateTimestamps(): void
+    {
+        $now = new \DateTime("now");
+        $this->setUpdatedAt($now);
+        if ($this->getCreatedAt() === null) {
+            $this->setCreatedAt($now);
+        }
+    }
+
     #[ORM\Id]
     #[ORM\GeneratedValue("CUSTOM")]
     #[ORM\CustomIdGenerator("doctrine.uuid_generator")]
@@ -33,7 +45,7 @@ class Article
     #[Groups([...self::USER_READ])]
     private ?string $url = null;
 
-    #[ORM\Column(nullable:true)]
+    #[ORM\Column(nullable: true)]
     #[Groups([...self::USER_READ])]
     private ?int $version = null;
 

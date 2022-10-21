@@ -9,6 +9,7 @@
         "composer/package-versions-deprecated": "1.11.99.5",
         "doctrine/annotations": "^1.13",
         "doctrine/doctrine-bundle": "^2.7",
+        "doctrine/doctrine-fixtures-bundle": "^3.4",
         "doctrine/doctrine-migrations-bundle": "^3.2",
         "doctrine/orm": "^2.12",
         "fakerphp/faker": "^1.20",
@@ -20,6 +21,7 @@
         "symfony/asset": "6.1.*",
         "symfony/console": "6.1.*",
         "symfony/doctrine-messenger": "6.1.*",
+        "symfony/dom-crawler": "6.1.*",
         "symfony/dotenv": "6.1.*",
         "symfony/expression-language": "6.1.*",
         "symfony/flex": "^2.2",
@@ -36,8 +38,7 @@
         "symfony/twig-bundle": "6.1.*",
         "symfony/uid": "6.1.*",
         "symfony/validator": "6.1.*",
-        "symfony/yaml": "6.1.*",
-        "doctrine/doctrine-fixtures-bundle": "^3.4"
+        "symfony/yaml": "6.1.*"
     },
     "require-dev": {
         "api-platform/schema-generator": "^4.0",
