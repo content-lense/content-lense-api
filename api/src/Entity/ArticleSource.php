@@ -6,31 +6,44 @@ use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ArticleSourceRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ArticleSourceRepository::class)]
 #[ApiResource]
 class ArticleSource
 {
+
+    const USER_READ = ["user:articlesource:collection:get", "user:artiarticlesourcecle:item:get"];
+    const USER_POST = ["user:articlesource:collection:post"];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups([...self::USER_READ,...self::USER_READ])]
     private ?string $type = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups([...self::USER_READ,...self::USER_READ])]
     private ?int $importIntervalInMinutes = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    #[Groups([...self::USER_READ,...self::USER_READ])]
     private ?\DateTimeInterface $lastUpdatedAt = null;
-
-    #[ORM\Column(nullable: true)]
-    private array $mappingConfig = [];
 
     #[ORM\ManyToOne(inversedBy: 'articleSources')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups([...self::USER_READ,...self::USER_READ])]
     private ?Organisation $organisation = null;
+
+    #[ORM\Column(nullable: true, options: ["jsonb" => true])]
+    private array $mappingConfig = [];
+
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups([...self::USER_READ,...self::USER_READ])]
+    private ?string $url = null;
 
     public function getId(): ?int
     {
@@ -73,6 +86,18 @@ class ArticleSource
         return $this;
     }
 
+    public function getOrganisation(): ?Organisation
+    {
+        return $this->organisation;
+    }
+
+    public function setOrganisation(?Organisation $organisation): self
+    {
+        $this->organisation = $organisation;
+
+        return $this;
+    }
+
     public function getMappingConfig(): array
     {
         return $this->mappingConfig;
@@ -85,14 +110,14 @@ class ArticleSource
         return $this;
     }
 
-    public function getOrganisation(): ?Organisation
+    public function getUrl(): ?string
     {
-        return $this->organisation;
+        return $this->url;
     }
 
-    public function setOrganisation(?Organisation $organisation): self
+    public function setUrl(?string $url): self
     {
-        $this->organisation = $organisation;
+        $this->url = $url;
 
         return $this;
     }
