@@ -40,11 +40,15 @@ class Organisation
     #[ORM\OneToMany(mappedBy: 'organisation', targetEntity: AnalysisMicroservice::class, orphanRemoval: true)]
     private Collection $analysisMicroservices;
 
+    #[ORM\OneToMany(mappedBy: 'organisation', targetEntity: ArticleSource::class, orphanRemoval: true)]
+    private Collection $articleSources;
+
     public function __construct()
     {
         $this->members = new ArrayCollection();
         $this->articles = new ArrayCollection();
         $this->analysisMicroservices = new ArrayCollection();
+        $this->articleSources = new ArrayCollection();
     }
 
     public function getId(): ?UuidV6
@@ -165,6 +169,36 @@ class Organisation
             // set the owning side to null (unless already changed)
             if ($analysisMicroservice->getOrganisation() === $this) {
                 $analysisMicroservice->setOrganisation(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ArticleSource>
+     */
+    public function getArticleSources(): Collection
+    {
+        return $this->articleSources;
+    }
+
+    public function addArticleSource(ArticleSource $articleSource): self
+    {
+        if (!$this->articleSources->contains($articleSource)) {
+            $this->articleSources->add($articleSource);
+            $articleSource->setOrganisation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeArticleSource(ArticleSource $articleSource): self
+    {
+        if ($this->articleSources->removeElement($articleSource)) {
+            // set the owning side to null (unless already changed)
+            if ($articleSource->getOrganisation() === $this) {
+                $articleSource->setOrganisation(null);
             }
         }
 
