@@ -18,6 +18,7 @@ class PostProcessorService
 {
  
     public const STORE_MENTIONED_PEOPLE = "STORE_MENTIONED_PEOPLE";
+    public const STORE_TEXT_COMPLEXITY = "STORE_TEXT_COMPLEXITY";
     private $em;
     
     public function __construct (EntityManagerInterface $em){
@@ -46,6 +47,11 @@ class PostProcessorService
         $this->em->persist($p);
         $this->em->flush();
         return $p;
+    }
+
+
+    public function storeTextComplexity(Article $article, $result){
+        // TODO: store text complexity result in entity
     }
 
     public function storeMentionedPeople(Article $article, $result) 
