@@ -49,7 +49,7 @@ class Article
     #[Groups([...self::USER_READ])]
     private ?int $version = null;
 
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]

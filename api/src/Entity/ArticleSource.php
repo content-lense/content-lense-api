@@ -13,6 +13,9 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class ArticleSource
 {
 
+    const TYPE_RSS = "RSS";
+
+    
     const USER_READ = ["user:articlesource:collection:get", "user:artiarticlesourcecle:item:get"];
     const USER_POST = ["user:articlesource:collection:post"];
 

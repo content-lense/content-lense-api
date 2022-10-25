@@ -2,7 +2,9 @@
 
 namespace App\Command;
 
-use App\Service\RssImportService;
+use App\Entity\ArticleSource;
+use App\Service\ArticleImportService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -12,15 +14,17 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
-    name: 'app:import-rss-feed',
-    description: 'Takes an url of an rss feed that should be imported',
+    name: 'app:import-articles',
+    description: 'Takes an url of an article source that should be started',
 )]
-class ImportRssFeedCommand extends Command
+class ImportArticleSourceCommand extends Command
 {
     private $importer;
-    public function __construct(RssImportService $rssImportService)
+    private $em;
+    public function __construct(ArticleImportService $articleImportService, EntityManagerInterface $em)
     {
-        $this->importer = $rssImportService;
+        $this->importer = $articleImportService;
+        $this->em = $em;
         parent::__construct();
     }
 
@@ -41,7 +45,13 @@ class ImportRssFeedCommand extends Command
             return Command::FAILURE;
         }
 
-        $this->importer->importFromUrl($url);
+        $source = $this->em->getRepository(ArticleSource::class)->findOneBy(["url" => $url]);
+        if(!$source){
+            $io->error("No article source configuration found for URL ".$url);
+            return Command::FAILURE;
+        }
+
+        $this->importer->importArticleSource($source);
 
         return Command::SUCCESS;
     }
