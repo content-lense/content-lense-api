@@ -81,11 +81,12 @@ class PostProcessorService
                 $articleComplexity->setReadingTimeInMinutes($result[$part][$scores]["readingTimeInMinutes"]);
 
                 $this->em->persist($articleComplexity);
-                $this->em->flush();
+                
             } else {
                 dump("Part does not exist in payload: " . $part);
             }
         }
+        $this->em->flush();
     }
 
     public function storeMentionedPeople(Article $article, $result)
