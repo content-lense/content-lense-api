@@ -46,8 +46,8 @@ class ImportArticleSourceCommand extends Command
         }
 
         $source = $this->em->getRepository(ArticleSource::class)->findOneBy(["url" => $url]);
-        if(!$source){
-            $io->error("No article source configuration found for URL ".$url);
+        if (!$source) {
+            $io->error("No article source configuration found for URL " . $url);
             return Command::FAILURE;
         }
 

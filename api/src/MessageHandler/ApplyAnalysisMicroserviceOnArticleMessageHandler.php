@@ -30,12 +30,13 @@ final class ApplyAnalysisMicroserviceOnArticleMessageHandler implements MessageH
     public function __invoke(ApplyAnalysisMicroserviceOnArticleMessage $message)
     {
         $article = $this->em->getRepository(Article::class)->find($message->getArticleId());
-        if(!$article){
+        if (!$article) {
             throw new UnrecoverableMessageHandlingException("Article not found");
         }
 
+        /** @var AnalysisMicroservice */
         $service = $this->em->getRepository(AnalysisMicroservice::class)->find($message->getAnalysisMicroserviceId());
-        if(!$service){
+        if (!$service) {
             throw new UnrecoverableMessageHandlingException("Unknown microservice");
         }
 
@@ -45,15 +46,16 @@ final class ApplyAnalysisMicroserviceOnArticleMessageHandler implements MessageH
 
         $response = $client->request($service->getMethod(), $service->getEndpoint(), [
             'json' => [
-                "id" => $article->getId(), 
+                "id" => $article->getId(),
                 "heading" => $article->getTitle(),
                 "summary" => $article->getAbstract(),
-                "authors" => $article->getAuthors()->map(fn(Person $person) => sprintf("%s %s", $person->getFirstName(), $person->getLastName())),
+                "authors" => $article->getAuthors()->map(fn (Person $person) => sprintf("%s %s", $person->getFirstName(), $person->getLastName())),
                 "body" => $article->getText()
             ]
-            ]);
-        
+        ]);
+
         if ($response->getStatusCode() == 200) {
+            dump(sprintf("Received result from micrsoservice %s from endpoint %s", $service->getName(), $service->getEndpoint()));
             try {
                 $content = json_decode($response->getContent(), true);
 
@@ -62,14 +64,15 @@ final class ApplyAnalysisMicroserviceOnArticleMessageHandler implements MessageH
                 $this->em->persist($result);
                 $this->em->flush();
 
-                foreach($service->getPostProcessors() as $processorName){
+                foreach ($service->getPostProcessors() as $processorName) {
                     $msg = new PostAnalysisProcessorMessage($result->getId(), $processorName);
                     $this->bus->dispatch($msg);
                 }
-            }catch(Exception $e){
+            } catch (Exception $e) {
                 dump($e);
             }
+        } else {
+            dump(sprintf("Status code %s from micrsoservice %s from endpoint %s", $response->getStatusCode(), $service->getName(), $service->getEndpoint()));
         }
-
     }
 }

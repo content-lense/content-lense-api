@@ -95,11 +95,16 @@ class Article
     #[Groups([...self::USER_READ])]
     private Collection $mentionedPersons;
 
+    #[ORM\OneToMany(mappedBy: 'article', targetEntity: ArticleComplexity::class, orphanRemoval: true)]
+    private Collection $complexities;
+
+
     public function __construct()
     {
         $this->authors = new ArrayCollection();
         $this->articleAnalysisResults = new ArrayCollection();
         $this->mentionedPersons = new ArrayCollection();
+        $this->complexities = new ArrayCollection();
     }
 
     public function getId(): ?UuidV6
@@ -299,5 +304,35 @@ class Article
     public function getMentionedPersons(): Collection
     {
         return $this->mentionedPersons;
+    }
+
+    /**
+     * @return Collection<int, ArticleComplexity>
+     */
+    public function getComplexities(): Collection
+    {
+        return $this->complexities;
+    }
+
+    public function addComplexity(ArticleComplexity $complexity): self
+    {
+        if (!$this->complexities->contains($complexity)) {
+            $this->complexities->add($complexity);
+            $complexity->setArticle($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComplexity(ArticleComplexity $complexity): self
+    {
+        if ($this->complexities->removeElement($complexity)) {
+            // set the owning side to null (unless already changed)
+            if ($complexity->getArticle() === $this) {
+                $complexity->setArticle(null);
+            }
+        }
+
+        return $this;
     }
 }
