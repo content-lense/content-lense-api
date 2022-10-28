@@ -21,10 +21,16 @@ framework:
                     delay: 5000
                     multiplier: 2
                     max_delay: 60000
+            async_post_processing:
+                dsn: "%env(MESSENGER_TRANSPORT_DSN)%"
+                options:
+                    queue_name: post_processors
+                retry_strategy:
+                    max_retries: 5
+                    # milliseconds delay
+                    delay: 5000
+                    multiplier: 2
+                    max_delay: 60000
         routing:
             App\Message\ApplyAnalysisMicroserviceOnArticleMessage: async
-            App\Message\PostAnalysisProcessorMessage: async
-            
-        #routing:
-        #    App\Message\AnalyzeArticle: async
-            
+            App\Message\PostAnalysisProcessorMessage: async_post_processing

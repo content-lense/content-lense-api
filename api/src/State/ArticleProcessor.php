@@ -7,6 +7,7 @@ use ApiPlatform\State\ProcessorInterface;
 use App\Entity\User;
 use App\Message\ApplyAnalysisMicroserviceOnArticleMessage;
 use App\Repository\AnalysisMicroserviceRepository;
+use App\Service\ArticleImportService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -19,12 +20,14 @@ final class ArticleProcessor implements ProcessorInterface
     private $bus;
     private $em;
     private $security;
-    public function __construct(ProcessorInterface $decorated, MessageBusInterface $bus, EntityManagerInterface $em, Security $security )
+    private $articleImportService;
+    public function __construct(ProcessorInterface $decorated, MessageBusInterface $bus, EntityManagerInterface $em, Security $security, ArticleImportService $articleImportService)
     {
         $this->bus = $bus;
         $this->security = $security;
         $this->em = $em;
         $this->decorated = $decorated;
+        $this->articleImportService = $articleImportService;
     }
 
     public function process($data, Operation $operation, array $uriVariables = [], array $context = [])
@@ -32,20 +35,13 @@ final class ArticleProcessor implements ProcessorInterface
         $result = $this->decorated->process($data, $operation, $uriVariables, $context);
         /** @var User */
         $user = $this->security->getUser();
-        if(!$user){
+        if (!$user) {
             return;
         }
+
         // TODO: which organisation should we take the services from? for now, just take the first:
         $organisation = $user->getOrganisations()->get(0);
-        $services = $organisation->getAnalysisMicroservices();
-        foreach($services as $service){
-            if($service->isIsActive() && $service->isAutoRunForNewArticles()){
-                dump("Send article to analysis: ".$service->getEndpoint());
-                $this->bus->dispatch(new ApplyAnalysisMicroserviceOnArticleMessage($result->getId(),$service->getId()));
-            }
-            
-        } 
+        $this->articleImportService->sendArticleToPostProcessors($organisation, $result);
         return $result;
     }
-
 }

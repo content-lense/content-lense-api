@@ -39,6 +39,12 @@ class DevAnalysisMicroservicesFixtures extends Fixture implements FixtureGroupIn
         $service->setOrganisation($organisation)->setMethod("POST")->setAutoRunForNewArticles(true);
         $service->setPostProcessors([PostProcessorService::STORE_MENTIONED_PEOPLE]);
         $m->persist($service);
+
+        $service = new AnalysisMicroservice();
+        $service->setName("Analyze text complexity")->setEndpoint("http://host.docker.internal:5001/articles")->setIsActive(true);
+        $service->setOrganisation($organisation)->setMethod("POST")->setAutoRunForNewArticles(true);
+        $service->setPostProcessors([PostProcessorService::STORE_TEXT_COMPLEXITY]);
+        $m->persist($service);
         $m->flush();
     }
 }

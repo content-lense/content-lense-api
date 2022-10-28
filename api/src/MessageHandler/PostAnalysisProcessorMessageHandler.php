@@ -35,6 +35,9 @@ final class PostAnalysisProcessorMessageHandler implements MessageHandlerInterfa
             case PostProcessorService::STORE_MENTIONED_PEOPLE: 
                 $this->postProcessor->storeMentionedPeople($article, $result->getRawResult());
                 break;
+            case PostProcessorService::STORE_TEXT_COMPLEXITY: 
+                $this->postProcessor->storeTextComplexity($article, $result->getRawResult());
+                break;
         }
     }
 }

@@ -23,6 +23,18 @@ class Article
     const USER_READ = ["user:article:collection:get", "user:article:item:get"];
     const USER_POST = ["user:article:collection:post"];
 
+
+    #[ORM\PreUpdate]
+    #[ORM\PrePersist]
+    public function updateTimestamps(): void
+    {
+        $now = new \DateTime("now");
+        $this->setUpdatedAt($now);
+        if ($this->getCreatedAt() === null) {
+            $this->setCreatedAt($now);
+        }
+    }
+
     #[ORM\Id]
     #[ORM\GeneratedValue("CUSTOM")]
     #[ORM\CustomIdGenerator("doctrine.uuid_generator")]
@@ -33,11 +45,11 @@ class Article
     #[Groups([...self::USER_READ])]
     private ?string $url = null;
 
-    #[ORM\Column(nullable:true)]
+    #[ORM\Column(nullable: true)]
     #[Groups([...self::USER_READ])]
     private ?int $version = null;
 
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $createdAt = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
@@ -83,11 +95,16 @@ class Article
     #[Groups([...self::USER_READ])]
     private Collection $mentionedPersons;
 
+    #[ORM\OneToMany(mappedBy: 'article', targetEntity: ArticleComplexity::class, orphanRemoval: true)]
+    private Collection $complexities;
+
+
     public function __construct()
     {
         $this->authors = new ArrayCollection();
         $this->articleAnalysisResults = new ArrayCollection();
         $this->mentionedPersons = new ArrayCollection();
+        $this->complexities = new ArrayCollection();
     }
 
     public function getId(): ?UuidV6
@@ -287,5 +304,35 @@ class Article
     public function getMentionedPersons(): Collection
     {
         return $this->mentionedPersons;
+    }
+
+    /**
+     * @return Collection<int, ArticleComplexity>
+     */
+    public function getComplexities(): Collection
+    {
+        return $this->complexities;
+    }
+
+    public function addComplexity(ArticleComplexity $complexity): self
+    {
+        if (!$this->complexities->contains($complexity)) {
+            $this->complexities->add($complexity);
+            $complexity->setArticle($this);
+        }
+
+        return $this;
+    }
+
+    public function removeComplexity(ArticleComplexity $complexity): self
+    {
+        if ($this->complexities->removeElement($complexity)) {
+            // set the owning side to null (unless already changed)
+            if ($complexity->getArticle() === $this) {
+                $complexity->setArticle(null);
+            }
+        }
+
+        return $this;
     }
 }
