@@ -100,6 +100,12 @@ class Article
     #[Groups([...self::USER_READ])]
     private Collection $complexities;
 
+    #[ORM\ManyToMany(targetEntity: ArticleTopic::class, mappedBy: 'articles')]
+    private Collection $articleTopics;
+
+    // #[ORM\OneToMany(mappedBy: 'article', targetEntity: ArticleComplexity::class, orphanRemoval: true)]
+    // private Collection $complexities;
+
 
     public function __construct()
     {
@@ -107,6 +113,7 @@ class Article
         $this->articleAnalysisResults = new ArrayCollection();
         $this->mentionedPersons = new ArrayCollection();
         $this->complexities = new ArrayCollection();
+        $this->articleTopics = new ArrayCollection();
     }
 
     public function getId(): ?UuidV6
@@ -334,6 +341,33 @@ class Article
             if ($complexity->getArticle() === $this) {
                 $complexity->setArticle(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ArticleTopic>
+     */
+    public function getArticleTopics(): Collection
+    {
+        return $this->articleTopics;
+    }
+
+    public function addArticleTopic(ArticleTopic $articleTopic): self
+    {
+        if (!$this->articleTopics->contains($articleTopic)) {
+            $this->articleTopics->add($articleTopic);
+            $articleTopic->addArticle($this);
+        }
+
+        return $this;
+    }
+
+    public function removeArticleTopic(ArticleTopic $articleTopic): self
+    {
+        if ($this->articleTopics->removeElement($articleTopic)) {
+            $articleTopic->removeArticle($this);
         }
 
         return $this;

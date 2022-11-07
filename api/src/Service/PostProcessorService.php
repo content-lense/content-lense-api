@@ -5,10 +5,12 @@ namespace App\Service;
 use App\Entity\Article;
 use App\Entity\ArticleComplexity;
 use App\Entity\ArticleMention;
+use App\Entity\ArticleTopic;
 use App\Entity\Organisation;
 use App\Entity\Person;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
@@ -21,6 +23,7 @@ class PostProcessorService
 
     public const STORE_MENTIONED_PEOPLE = "STORE_MENTIONED_PEOPLE";
     public const STORE_TEXT_COMPLEXITY = "STORE_TEXT_COMPLEXITY";
+    public const STORE_TOPIC_DETECTION = "STORE_TOPIC_DETECTION";
     private $em;
 
     public function __construct(EntityManagerInterface $em)
@@ -112,5 +115,24 @@ class PostProcessorService
                 $this->em->flush();
             }
         }
+    }
+
+    public function storeTopicDetection(Article $article, $result)
+    {
+        if(!array_key_exists("topics", $result) && is_array($result["topics"])){
+            throw new Exception("No topics found in microservice response");
+        }
+        foreach($result["topics"] as $topic){
+            /** @var ArticleTopic */
+            $articleTopic = $this->em->getRepository(ArticleTopic::class)->findOneBy(["name" => $topic]);
+            if(!$articleTopic){
+                $articleTopic = new ArticleTopic();
+                $articleTopic->setName($topic);
+            }
+            $articleTopic->addArticle($article);
+            $this->em->persist($articleTopic);
+        }
+
+        $this->em->flush();   
     }
 }

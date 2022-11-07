@@ -38,6 +38,9 @@ final class PostAnalysisProcessorMessageHandler implements MessageHandlerInterfa
             case PostProcessorService::STORE_TEXT_COMPLEXITY: 
                 $this->postProcessor->storeTextComplexity($article, $result->getRawResult());
                 break;
+            case PostProcessorService::STORE_TOPIC_DETECTION: 
+                $this->postProcessor->storeTopicDetection($article, $result->getRawResult());
+                break;
         }
     }
 }
