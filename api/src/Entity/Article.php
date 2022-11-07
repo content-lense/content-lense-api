@@ -22,6 +22,7 @@ class Article
 {
     const USER_READ = ["user:article:collection:get", "user:article:item:get"];
     const USER_POST = ["user:article:collection:post"];
+    const IN_ARTICLE_COMPLEXITY = ["user:articlecomplexity:collection:get"];
 
 
     #[ORM\PreUpdate]
@@ -64,7 +65,7 @@ class Article
     private ?string $language = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups([...self::USER_READ, ...self::USER_POST])]
+    #[Groups([...self::USER_READ, ...self::USER_POST, ...self::IN_ARTICLE_COMPLEXITY])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -96,6 +97,7 @@ class Article
     private Collection $mentionedPersons;
 
     #[ORM\OneToMany(mappedBy: 'article', targetEntity: ArticleComplexity::class, orphanRemoval: true)]
+    #[Groups([...self::USER_READ])]
     private Collection $complexities;
 
 
@@ -305,6 +307,7 @@ class Article
     {
         return $this->mentionedPersons;
     }
+
 
     /**
      * @return Collection<int, ArticleComplexity>
