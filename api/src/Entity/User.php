@@ -164,6 +164,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $numberOfLogins = 0;
 
     #[ORM\ManyToMany(targetEntity: Organisation::class, mappedBy: 'members')]
+    #[Groups(["me", ...self::ADMIN_READ])]
     private Collection $organisations;
 
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Organisation::class)]

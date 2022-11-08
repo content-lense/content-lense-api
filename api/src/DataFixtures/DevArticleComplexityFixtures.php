@@ -32,7 +32,7 @@ class DevArticleComplexityFixtures extends Fixture implements FixtureGroupInterf
 
 
         $articles = $m->getRepository(Article::class)->findAll();
-        foreach ($articles as $article) {
+        for ($i = 0; $i < 50; $i++) {
             $a = new ArticleComplexity();
             $a->setTotalWords($faker->numberBetween(500, 5000))
                 ->setReadingTimeInMinutes($faker->numberBetween(5, 50))
@@ -42,7 +42,7 @@ class DevArticleComplexityFixtures extends Fixture implements FixtureGroupInterf
                 ->setTotalSentences($faker->numberBetween(50, 500))
                 ->setPart("body")
                 ->setMeanWordsPerSentence($faker->randomFloat(2, 0, 30))
-                ->setArticle($article);
+                ->setArticle($articles[array_rand($articles, 1)]);
             $m->persist($a);
         }
         $m->flush();
