@@ -44,14 +44,17 @@ final class ApplyAnalysisMicroserviceOnArticleMessageHandler implements MessageH
             'headers' => $service->getHeaders()
         ]);
 
+        $payload = [
+            "id" => $article->getId(),
+            "heading" => $article->getTitle(),
+            "summary" => $article->getAbstract(),
+            "authors" => $article->getAuthors()->map(fn (Person $person) => sprintf("%s %s", $person->getFirstName(), $person->getLastName())),
+            "body" => $article->getText()
+        ];
+        $payload = array_merge($payload, $service->getAdditionalPayload() ?? []);
+        
         $response = $client->request($service->getMethod(), $service->getEndpoint(), [
-            'json' => [
-                "id" => $article->getId(),
-                "heading" => $article->getTitle(),
-                "summary" => $article->getAbstract(),
-                "authors" => $article->getAuthors()->map(fn (Person $person) => sprintf("%s %s", $person->getFirstName(), $person->getLastName())),
-                "body" => $article->getText()
-            ]
+            'json' => $payload
         ]);
 
         if ($response->getStatusCode() == 200) {

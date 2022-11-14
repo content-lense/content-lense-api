@@ -2,6 +2,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Article;
+use App\Entity\ArticleComplexity;
 use App\Entity\Organisation;
 use App\Entity\Person;
 use App\Entity\User;
@@ -27,7 +28,7 @@ class DevArticlesFixtures extends Fixture implements FixtureGroupInterface, Depe
         return [
             DevOrganisationFixtures::class,
             DevUserFixtures::class,
-            DevPersonsFixtures::class
+            DevPersonsFixtures::class,
         ];
     }
 
@@ -47,7 +48,6 @@ class DevArticlesFixtures extends Fixture implements FixtureGroupInterface, Depe
             if($faker->boolean() && $firstAuthor !== $secondAuthor){
                 $a->addAuthor($secondAuthor);
             }
-            
             $m->persist($a);
         }
         $m->flush();

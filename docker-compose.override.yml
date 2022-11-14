@@ -8,6 +8,7 @@ services:
       - ./api/docker/php/conf.d/api-platform.dev.ini:/usr/local/etc/php/conf.d/api-platform.ini
       # if you develop on Linux, you may use a bind-mounted host directory instead
       - ./api/var:/srv/api/var:rw
+      - ./api/docker/php/supervisor.d/messenger-worker.ini:/etc/supervisor.d/messenger-worker.ini
     environment:
       APP_ENV: dev
     extra_hosts:

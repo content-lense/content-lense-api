@@ -11,8 +11,9 @@ use App\Repository\ArticleComplexityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Uid\UuidV6;
 
-#[ApiFilter(RangeFilter::class, properties: ["wienerSachtextIndex"])]
+#[ApiFilter(RangeFilter::class, properties: ["wienerSachtextIndex", "readingTimeInMinutes", "totalSentences", "totalWords", "totalChars", "meanWordsPerSentence", "meanCharsPerWord"])]
 #[ApiFilter(SearchFilter::class, properties: ['part' => 'exact'])]
 #[ApiFilter(PropertyFilter::class)]
 #[ORM\Entity(repositoryClass: ArticleComplexityRepository::class)]
@@ -20,13 +21,12 @@ use Symfony\Component\Serializer\Annotation\Groups;
 class ArticleComplexity
 {
 
-    const USER_READ = ["user:articlecomplexity:collection:get", "user:articlecomplexity:item:get"];
+    const USER_READ = ["user:articlecomplexity:collection:get", "user:articlecomplexity:item:get", "user:article:item:get", "user:article:collection:get"];
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
-
+    #[ORM\GeneratedValue("CUSTOM")]
+    #[ORM\CustomIdGenerator("doctrine.uuid_generator")]
+    #[ORM\Column(type: 'uuid', unique: true)]
+    private $id = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups([...self::USER_READ])]
@@ -40,12 +40,14 @@ class ArticleComplexity
     private ?int $medianWordsPerSentence = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups([...self::USER_READ])]
     private ?int $totalChars = null;
 
     #[ORM\Column(nullable: true)]
     private ?int $totalLetters = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups([...self::USER_READ])]
     private ?int $totalSentences = null;
 
     #[ORM\Column(nullable: true)]
@@ -55,6 +57,7 @@ class ArticleComplexity
     private ?int $totalUniqueWords = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups([...self::USER_READ])]
     private ?int $totalWords = null;
 
     #[ORM\Column(nullable: true)]
@@ -71,18 +74,24 @@ class ArticleComplexity
     #[Groups([...self::USER_READ])]
     private ?float $wienerSachtextIndex = null;
 
-    #[ORM\ManyToOne(inversedBy: 'complexities')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Article $article = null;
+    // #[ORM\ManyToOne(inversedBy: 'complexities')]
+    // #[ORM\JoinColumn(nullable: true)]
+    // private ?Article $article = null;
 
     #[ORM\Column(type: Types::TEXT)]
     #[Groups([...self::USER_READ])]
     private ?string $part = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups([...self::USER_READ])]
     private ?float $meanWordsPerSentence = null;
 
-    public function getId(): ?int
+    #[ORM\ManyToOne(inversedBy: 'complexities')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups([...self::USER_READ])]
+    private ?Article $article = null;
+
+    public function getId(): ?UuidV6
     {
         return $this->id;
     }
@@ -245,17 +254,6 @@ class ArticleComplexity
         return $this;
     }
 
-    public function getArticle(): ?Article
-    {
-        return $this->article;
-    }
-
-    public function setArticle(?Article $article): self
-    {
-        $this->article = $article;
-
-        return $this;
-    }
 
     public function getPart(): ?string
     {
@@ -277,6 +275,18 @@ class ArticleComplexity
     public function setMeanWordsPerSentence(?float $meanWordsPerSentence): self
     {
         $this->meanWordsPerSentence = $meanWordsPerSentence;
+
+        return $this;
+    }
+
+    public function getArticle(): ?Article
+    {
+        return $this->article;
+    }
+
+    public function setArticle(?Article $article): self
+    {
+        $this->article = $article;
 
         return $this;
     }

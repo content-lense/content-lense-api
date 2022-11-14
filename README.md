@@ -18,7 +18,7 @@ _This is the API of Content Lense, a project that aims at enabling publishers to
 # Checkout and start the API docker stack
 git clone git@github.com:content-lense/content-lense-api.git
 cd content-lense-api
-docker compose up -f
+docker compose up -d
 
 # Create the database, load doctrine fixtures and create jwt key pairs
 ./dev_flush_db.sh

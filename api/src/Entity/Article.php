@@ -22,6 +22,7 @@ class Article
 {
     const USER_READ = ["user:article:collection:get", "user:article:item:get"];
     const USER_POST = ["user:article:collection:post"];
+    const IN_ARTICLE_COMPLEXITY = ["user:articlecomplexity:collection:get"];
 
 
     #[ORM\PreUpdate]
@@ -64,7 +65,7 @@ class Article
     private ?string $language = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups([...self::USER_READ, ...self::USER_POST])]
+    #[Groups([...self::USER_READ, ...self::USER_POST, ...self::IN_ARTICLE_COMPLEXITY])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -96,7 +97,14 @@ class Article
     private Collection $mentionedPersons;
 
     #[ORM\OneToMany(mappedBy: 'article', targetEntity: ArticleComplexity::class, orphanRemoval: true)]
+    #[Groups([...self::USER_READ])]
     private Collection $complexities;
+
+    #[ORM\ManyToMany(targetEntity: ArticleTopic::class, mappedBy: 'articles')]
+    private Collection $articleTopics;
+
+    // #[ORM\OneToMany(mappedBy: 'article', targetEntity: ArticleComplexity::class, orphanRemoval: true)]
+    // private Collection $complexities;
 
 
     public function __construct()
@@ -105,6 +113,7 @@ class Article
         $this->articleAnalysisResults = new ArrayCollection();
         $this->mentionedPersons = new ArrayCollection();
         $this->complexities = new ArrayCollection();
+        $this->articleTopics = new ArrayCollection();
     }
 
     public function getId(): ?UuidV6
@@ -306,6 +315,7 @@ class Article
         return $this->mentionedPersons;
     }
 
+
     /**
      * @return Collection<int, ArticleComplexity>
      */
@@ -331,6 +341,33 @@ class Article
             if ($complexity->getArticle() === $this) {
                 $complexity->setArticle(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ArticleTopic>
+     */
+    public function getArticleTopics(): Collection
+    {
+        return $this->articleTopics;
+    }
+
+    public function addArticleTopic(ArticleTopic $articleTopic): self
+    {
+        if (!$this->articleTopics->contains($articleTopic)) {
+            $this->articleTopics->add($articleTopic);
+            $articleTopic->addArticle($this);
+        }
+
+        return $this;
+    }
+
+    public function removeArticleTopic(ArticleTopic $articleTopic): self
+    {
+        if ($this->articleTopics->removeElement($articleTopic)) {
+            $articleTopic->removeArticle($this);
         }
 
         return $this;

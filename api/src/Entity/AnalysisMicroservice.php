@@ -64,6 +64,9 @@ class AnalysisMicroservice
     #[ORM\Column(type: Types::SIMPLE_ARRAY)]
     private array $postProcessors = [];
 
+    #[ORM\Column(nullable: true)]
+    private array $additionalPayload = [];
+
     public function __construct()
     {
         $this->articleAnalysisResults = new ArrayCollection();
@@ -224,6 +227,18 @@ class AnalysisMicroservice
     public function setPostProcessors(array $postProcessors): self
     {
         $this->postProcessors = $postProcessors;
+
+        return $this;
+    }
+
+    public function getAdditionalPayload(): array
+    {
+        return $this->additionalPayload;
+    }
+
+    public function setAdditionalPayload(?array $additionalPayload): self
+    {
+        $this->additionalPayload = $additionalPayload;
 
         return $this;
     }
