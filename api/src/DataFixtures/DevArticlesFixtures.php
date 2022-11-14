@@ -3,6 +3,7 @@ namespace App\DataFixtures;
 
 use App\Entity\Article;
 use App\Entity\ArticleComplexity;
+use App\Entity\ArticleTopic;
 use App\Entity\Organisation;
 use App\Entity\Person;
 use App\Entity\User;
@@ -29,6 +30,7 @@ class DevArticlesFixtures extends Fixture implements FixtureGroupInterface, Depe
             DevOrganisationFixtures::class,
             DevUserFixtures::class,
             DevPersonsFixtures::class,
+            DevArticleTopicsFixtures::class
         ];
     }
 
@@ -48,6 +50,11 @@ class DevArticlesFixtures extends Fixture implements FixtureGroupInterface, Depe
             if($faker->boolean() && $firstAuthor !== $secondAuthor){
                 $a->addAuthor($secondAuthor);
             }
+            for($k=0;$k<rand(0,3);$k++){
+                $topic = $this->getReference(DevArticleTopicsFixtures::FIXTURE_TOPICS[array_rand(DevArticleTopicsFixtures::FIXTURE_TOPICS)]);
+                $a->addArticleTopic($topic);
+            }
+            
             $m->persist($a);
         }
         $m->flush();
