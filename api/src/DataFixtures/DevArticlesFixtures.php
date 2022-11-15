@@ -39,7 +39,7 @@ class DevArticlesFixtures extends Fixture implements FixtureGroupInterface, Depe
         $faker = Factory::create();
        
         $persons = $m->getRepository(Person::class)->findAll();
-        for($i = 0; $i<50;$i++){
+        for($i = 0; $i<500;$i++){
             $a = new Article();
             $a->setAbstract($faker->sentences(1,true))->setLanguage("DE")->setPublishedAt($faker->dateTimeThisCentury())
             ->setTitle($faker->sentence(8))->setUrl($faker->url())->setVersion(1)->setImage($faker->imageUrl())->setText($faker->paragraphs(3, true));

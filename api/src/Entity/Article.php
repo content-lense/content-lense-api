@@ -20,7 +20,7 @@ use Symfony\Component\Uid\UuidV6;
 #[ApiResource(processor: ArticleProcessor::class)]
 class Article
 {
-    const USER_READ = ["user:article:collection:get", "user:article:item:get"];
+    const USER_READ = ["user:article:collection:get", "user:article:item:get", "user:articletopic:item:get", "user:articletopic:collection:get"];
     const USER_POST = ["user:article:collection:post"];
     const IN_ARTICLE_COMPLEXITY = ["user:articlecomplexity:collection:get"];
 
