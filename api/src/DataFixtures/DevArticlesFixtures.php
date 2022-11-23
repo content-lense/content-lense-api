@@ -3,6 +3,7 @@ namespace App\DataFixtures;
 
 use App\Entity\Article;
 use App\Entity\ArticleComplexity;
+use App\Entity\ArticleTopic;
 use App\Entity\Organisation;
 use App\Entity\Person;
 use App\Entity\User;
@@ -29,6 +30,7 @@ class DevArticlesFixtures extends Fixture implements FixtureGroupInterface, Depe
             DevOrganisationFixtures::class,
             DevUserFixtures::class,
             DevPersonsFixtures::class,
+            DevArticleTopicsFixtures::class
         ];
     }
 
@@ -37,7 +39,7 @@ class DevArticlesFixtures extends Fixture implements FixtureGroupInterface, Depe
         $faker = Factory::create();
        
         $persons = $m->getRepository(Person::class)->findAll();
-        for($i = 0; $i<50;$i++){
+        for($i = 0; $i<500;$i++){
             $a = new Article();
             $a->setAbstract($faker->sentences(1,true))->setLanguage("DE")->setPublishedAt($faker->dateTimeThisCentury())
             ->setTitle($faker->sentence(8))->setUrl($faker->url())->setVersion(1)->setImage($faker->imageUrl())->setText($faker->paragraphs(3, true));
@@ -48,6 +50,11 @@ class DevArticlesFixtures extends Fixture implements FixtureGroupInterface, Depe
             if($faker->boolean() && $firstAuthor !== $secondAuthor){
                 $a->addAuthor($secondAuthor);
             }
+            for($k=0;$k<rand(0,3);$k++){
+                $topic = $this->getReference(DevArticleTopicsFixtures::FIXTURE_TOPICS[array_rand(DevArticleTopicsFixtures::FIXTURE_TOPICS)]);
+                $a->addArticleTopic($topic);
+            }
+            
             $m->persist($a);
         }
         $m->flush();
