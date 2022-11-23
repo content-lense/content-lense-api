@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\ArticleTopicRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -12,6 +14,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ArticleTopicRepository::class)]
+#[ApiFilter(OrderFilter::class, properties: ['name'])]
 #[ApiResource]
 class ArticleTopic
 {
