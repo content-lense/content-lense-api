@@ -5,6 +5,8 @@ namespace App\Entity;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Serializer\Filter\PropertyFilter;
+use App\Filter\CountFilter;
 use App\Repository\ArticleTopicRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -15,6 +17,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ArticleTopicRepository::class)]
 #[ApiFilter(OrderFilter::class, properties: ['name'])]
+#[ApiFilter(CountFilter::class, properties: ['articles'])]
+#[ApiFilter(PropertyFilter::class)]
 #[ApiResource]
 class ArticleTopic
 {

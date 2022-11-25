@@ -13,6 +13,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use App\Filter\MultipleFieldSearchFilter;
 use App\State\ArticleProcessor;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\UuidV6;
@@ -20,6 +21,9 @@ use Symfony\Component\Uid\UuidV6;
 #[ORM\Entity(repositoryClass: ArticleRepository::class)]
 #[ORM\HasLifecycleCallbacks]
 #[ApiFilter(SearchFilter::class, properties: ['id' => 'exact', 'title' => 'ipartial'])]
+#[ApiFilter(MultipleFieldSearchFilter::class, properties: [
+    "title", "text", "abstract", "authors.firstName", "authors.lastName"
+])]
 #[ApiFilter(Datefilter::class, properties: ["createdAt"])]
 #[ApiFilter(OrderFilter::class, properties: ["createdAt"], arguments: ['orderParameterName' => 'order'])]
 #[ApiFilter(PropertyFilter::class)]
