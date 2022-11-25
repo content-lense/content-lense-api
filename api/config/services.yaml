@@ -44,3 +44,6 @@ services:
     App\State\ArticleProcessor:
         bind:
             $decorated: '@api_platform.doctrine.orm.state.persist_processor'
+    App\Filter\MultipleFieldSearchFilter:
+        arguments:
+            $searchParameterName: "q"
