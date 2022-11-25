@@ -49,13 +49,20 @@ class DevAnalysisMicroservicesFixtures extends Fixture implements FixtureGroupIn
         $m->flush();
 
         $service = new AnalysisMicroservice();
-        $service->setName("Analyze topic detection")->setEndpoint("http://host.docker.internal:5002/articles")->setIsActive(true);
+        $service->setName("Analyze topic detection")->setEndpoint("http://host.docker.internal:5002/articles")->setIsActive(false);
         $service->setOrganisation($organisation)->setMethod("POST")->setAutoRunForNewArticles(true);
         $service->setPostProcessors([PostProcessorService::STORE_TOPIC_DETECTION]);
         $service->setAdditionalPayload([
             "customTopics" => DevArticleTopicsFixtures::FIXTURE_TOPICS,
             "totalTopics" => 3
         ]);
+        $m->persist($service);
+        $m->flush();
+
+        $service = new AnalysisMicroservice();
+        $service->setName("Sentiment analysis")->setEndpoint("http://host.docker.internal:5003/articles")->setIsActive(true);
+        $service->setOrganisation($organisation)->setMethod("POST")->setAutoRunForNewArticles(true);
+        $service->setPostProcessors([PostProcessorService::STORE_SENTIMENT]);
         $m->persist($service);
         $m->flush();
     }
