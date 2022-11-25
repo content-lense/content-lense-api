@@ -3,6 +3,7 @@
 namespace App\MessageHandler;
 
 use App\Entity\ArticleAnalysisResult;
+use App\Entity\ArticleAnalysisStatus;
 use App\Entity\ArticleMention;
 use App\Message\PostAnalysisProcessorMessage;
 use App\Service\PostProcessorService;
@@ -28,6 +29,10 @@ final class PostAnalysisProcessorMessageHandler implements MessageHandlerInterfa
             throw new UnrecoverableMessageHandlingException("Article analysis result not found");
         }
 
+        $result->setStatus(ArticleAnalysisStatus::POST_PROCESSING);
+        $this->em->persist($result);
+        $this->em->flush();
+
         $article = $result->getArticle();
         $processorName = $message->getProcessorName();
         
@@ -41,7 +46,14 @@ final class PostAnalysisProcessorMessageHandler implements MessageHandlerInterfa
             case PostProcessorService::STORE_TOPIC_DETECTION: 
                 $this->postProcessor->storeTopicDetection($article, $result->getRawResult());
                 break;
+            case PostProcessorService::STORE_SENTIMENT: 
+                $this->postProcessor->storeSentiment($article, $result->getRawResult());
+                break;
         }
+
+        $result->setStatus(ArticleAnalysisStatus::DONE);
+        $this->em->persist($result);
+        $this->em->flush();
     }
 }
 

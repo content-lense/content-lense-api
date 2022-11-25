@@ -27,7 +27,7 @@ use Symfony\Component\Uid\UuidV6;
 #[ApiFilter(Datefilter::class, properties: ["createdAt"])]
 #[ApiFilter(OrderFilter::class, properties: ["createdAt"], arguments: ['orderParameterName' => 'order'])]
 #[ApiFilter(PropertyFilter::class)]
-#[ApiResource(processor: ArticleProcessor::class)]
+#[ApiResource(processor: ArticleProcessor::class, order:["createdAt" => "desc"])]
 class Article
 {
     const USER_READ = ["user:article:collection:get", "user:article:item:get", "user:articletopic:item:get", "user:articletopic:collection:get"];
@@ -59,6 +59,18 @@ class Article
     #[ORM\Column(nullable: true)]
     #[Groups([...self::USER_READ])]
     private ?int $version = null;
+    
+    #[ORM\Column(nullable: true)]
+    #[Groups([...self::USER_READ])]
+    private ?int $sentimentOfHeading = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups([...self::USER_READ])]
+    private ?int $sentimentOfText = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups([...self::USER_READ])]
+    private ?int $sentimentOfAbstract = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     #[Groups([...self::USER_READ])]
@@ -114,6 +126,9 @@ class Article
     #[ORM\ManyToMany(targetEntity: ArticleTopic::class, mappedBy: 'articles')]
     private Collection $articleTopics;
 
+    // #[ORM\OneToMany(mappedBy: 'article', targetEntity: ArticleComplexity::class, orphanRemoval: true)]
+    // private Collection $complexities;
+
 
     public function __construct()
     {
@@ -149,6 +164,42 @@ class Article
     public function setVersion(int $version): self
     {
         $this->version = $version;
+
+        return $this;
+    }
+
+    public function getSentimentOfHeading(): ?int
+    {
+        return $this->sentimentOfHeading;
+    }
+
+    public function setSentimentOfHeading(int $sentimentOfHeading): self
+    {
+        $this->sentimentOfHeading = $sentimentOfHeading;
+
+        return $this;
+    }
+
+    public function getSentimentOfText(): ?int
+    {
+        return $this->sentimentOfText;
+    }
+
+    public function setSentimentOfText(int $sentimentOfText): self
+    {
+        $this->sentimentOfText = $sentimentOfText;
+
+        return $this;
+    }
+
+    public function getSentimentOfAbstract(): ?int
+    {
+        return $this->sentimentOfAbstract;
+    }
+
+    public function setSentimentOfAbstract(int $sentimentOfAbstract): self
+    {
+        $this->sentimentOfAbstract = $sentimentOfAbstract;
 
         return $this;
     }

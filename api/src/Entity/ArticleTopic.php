@@ -79,6 +79,12 @@ class ArticleTopic
         return $this->articles;
     }
 
+    #[Groups([...self::USER_READ])]
+    public function getArticleCount(): int
+    {
+        return $this->articles->count();
+    }
+
     public function addArticle(Article $article): self
     {
         if (!$this->articles->contains($article)) {

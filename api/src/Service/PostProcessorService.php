@@ -24,6 +24,7 @@ class PostProcessorService
     public const STORE_MENTIONED_PEOPLE = "STORE_MENTIONED_PEOPLE";
     public const STORE_TEXT_COMPLEXITY = "STORE_TEXT_COMPLEXITY";
     public const STORE_TOPIC_DETECTION = "STORE_TOPIC_DETECTION";
+    public const STORE_SENTIMENT = "STORE_SENTIMENT";
     private $em;
 
     public function __construct(EntityManagerInterface $em)
@@ -55,6 +56,23 @@ class PostProcessorService
         return $p;
     }
 
+    public function storeSentiment(Article $article, $result)
+    {
+        $parts = ["heading", "body", "summary"];
+        foreach ($parts as $part) {
+            if (array_key_exists("heading", $result)) {
+                $article->setSentimentOfHeading($result["heading"]["score"]);
+            }
+            if (array_key_exists("body", $result)) {
+                $article->setSentimentOfText($result["body"]["score"]);
+            }
+            if (array_key_exists("summary", $result)) {
+                $article->setSentimentOfAbstract($result["summary"]["score"]);
+            }
+            $this->em->persist($article);
+        }
+        $this->em->flush();
+    }
 
     public function storeTextComplexity(Article $article, $result)
     {
@@ -119,7 +137,7 @@ class PostProcessorService
 
     public function storeTopicDetection(Article $article, $result)
     {
-        if(!array_key_exists("topics", $result) && is_array($result["topics"])){
+        if(!array_key_exists("topics", $result) || !is_array($result["topics"])){
             throw new Exception("No topics found in microservice response");
         }
         foreach($result["topics"] as $topic){
