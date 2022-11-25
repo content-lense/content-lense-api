@@ -5,6 +5,7 @@ namespace App\MessageHandler;
 use App\Entity\AnalysisMicroservice;
 use App\Entity\Article;
 use App\Entity\ArticleAnalysisResult;
+use App\Enums\ArticleAnalysisStatus;
 use App\Entity\Person;
 use App\Message\ApplyAnalysisMicroserviceOnArticleMessage;
 use App\Message\PostAnalysisProcessorMessage;
@@ -40,6 +41,15 @@ final class ApplyAnalysisMicroserviceOnArticleMessageHandler implements MessageH
             throw new UnrecoverableMessageHandlingException("Unknown microservice");
         }
 
+        $result = $this->em->getRepository(ArticleAnalysisResult::class)->findOneBy(["analysisMicroservice" => $service, "article" => $article]);
+        if(!$result){
+            throw new Exception("Could not find article analysis result for service id ".$service->getId()." and article id ".$article->getid());
+        }
+        $result->setStatus(ArticleAnalysisStatus::PROCESSING);
+        $this->em->persist($result);
+        $this->em->flush();
+
+        
         $client = $this->client->withOptions([
             'headers' => $service->getHeaders()
         ]);
@@ -58,12 +68,11 @@ final class ApplyAnalysisMicroserviceOnArticleMessageHandler implements MessageH
         ]);
 
         if ($response->getStatusCode() == 200) {
-            dump(sprintf("Received result from micrsoservice %s from endpoint %s", $service->getName(), $service->getEndpoint()));
             try {
                 $content = json_decode($response->getContent(), true);
 
-                $result = new ArticleAnalysisResult();
-                $result->setArticle($article)->setRawResult($content)->setAnalysisMicroservice($service);
+                
+                $result->setRawResult($content)->setStatus(ArticleAnalysisStatus::PROCESSED);
                 $this->em->persist($result);
                 $this->em->flush();
 

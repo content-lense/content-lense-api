@@ -3,14 +3,19 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use App\Enums\ArticleAnalysisStatus;
 use App\Repository\ArticleAnalysisResultRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\UuidV6;
 
 #[ORM\Entity(repositoryClass: ArticleAnalysisResultRepository::class)]
 #[ApiResource]
 class ArticleAnalysisResult
 {
+    
+    const USER_READ = ["user:articleanalysisresult:collection:get", "user:articleanalysisresult:item:get"];
+
     #[ORM\Id]
     #[ORM\GeneratedValue("CUSTOM")]
     #[ORM\CustomIdGenerator("doctrine.uuid_generator")]
@@ -19,6 +24,7 @@ class ArticleAnalysisResult
 
     #[ORM\ManyToOne(inversedBy: 'articleAnalysisResults')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups([...self::USER_READ])]
     private ?AnalysisMicroservice $analysisMicroservice = null;
 
     #[ORM\Column(nullable: true)]
@@ -26,11 +32,36 @@ class ArticleAnalysisResult
 
     #[ORM\ManyToOne(inversedBy: 'articleAnalysisResults')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups([...self::USER_READ])]
     private ?Article $article = null;
+
+    #[ORM\Column(type: 'string', enumType: ArticleAnalysisStatus::class)]
+    #[Groups([...self::USER_READ])]
+    public ArticleAnalysisStatus $status;
+
+    public function getStatus(): ArticleAnalysisStatus
+    {
+        return $this->status;
+    }
+
+    public function setStatus(ArticleAnalysisStatus $status): self
+    {
+        $this->status = $status;
+        return $this;
+    }
 
     public function getId(): ?UuidV6
     {
         return $this->id;
+    }
+
+    #[Groups([...self::USER_READ])]
+    public function getAnalysisMicroserviceName(): ?string
+    {
+        if($this->analysisMicroservice){
+            return $this->analysisMicroservice->getName();
+        }
+        return null;
     }
 
     public function getAnalysisMicroservice(): ?AnalysisMicroservice

@@ -3,8 +3,10 @@
 namespace App\Service;
 
 use App\Entity\Article;
+use App\Entity\ArticleAnalysisResult;
 use App\Entity\ArticleSource;
 use App\Entity\Organisation;
+use App\Enums\ArticleAnalysisStatus;
 use App\Message\ApplyAnalysisMicroserviceOnArticleMessage;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
@@ -47,6 +49,10 @@ class ArticleImportService
     {
         $services = $organisation->getAnalysisMicroservices();
         foreach ($services as $service) {
+            $result = new ArticleAnalysisResult();
+            $result->setStatus(ArticleAnalysisStatus::PUSHED)->setArticle($article)->setAnalysisMicroservice($service);
+            $this->em->persist($result);
+            $this->em->flush();
             if ($service->isIsActive() && $service->isAutoRunForNewArticles()) {
                 $this->bus->dispatch(new ApplyAnalysisMicroserviceOnArticleMessage($article->getId(), $service->getId()));
             }
