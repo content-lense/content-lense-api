@@ -13,17 +13,18 @@ final class CountFilter extends AbstractFilter
 
     protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
     {
-        if($property !== "order_by_relation_count") return;
-        
+        if ($property !== "order_by_relation_count") return;
+
         $rootAlias = $queryBuilder->getRootAliases()[0];
         foreach ($value as $prop => $sortBy) { //NOTE: we use array_keys because getProperties() returns a map of property => strategy
             $parameterName = $queryNameGenerator->generateParameterName($prop);
-            
+
+            // TODO: if no explicit properties are queried via &properites[]=field, an error occurs!
             $queryBuilder
-                ->innerJoin(sprintf("%s.%s", $rootAlias, $prop), $parameterName)
-                ->addSelect(sprintf('COUNT(%s) as tmpCount',$parameterName))
-                ->addOrderBy("tmpCount", $sortBy ?? "asc")
-                ->addGroupBy(sprintf("%s.id", $rootAlias));
+                ->innerJoin(sprintf("%s.%s", $rootAlias, $prop), "joined_" . $parameterName)
+                ->addSelect(sprintf('COUNT(%s) as HIDDEN tmpCount ', "joined_" . $parameterName))
+                ->addGroupBy(sprintf("%s.id", $rootAlias))
+                ->addOrderBy("tmpCount", $sortBy ?? "asc");
         }
     }
 
