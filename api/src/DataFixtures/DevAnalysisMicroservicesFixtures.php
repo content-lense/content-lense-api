@@ -32,6 +32,11 @@ class DevAnalysisMicroservicesFixtures extends Fixture implements FixtureGroupIn
         ];
     }
 
+    const MENTIONED_PEOPLE = "mentioned_people";
+    const TEXT_COMPLEXITY = "text_complexity";
+    const TOPIC_DETECTION = "topic_detection";
+    const SENTIMENT = "sentiment";
+    const MICROSERVICES = [self::MENTIONED_PEOPLE, self::TEXT_COMPLEXITY, self::SENTIMENT, self::TOPIC_DETECTION];
     public function load(ObjectManager $m): void
     {
         $organisation = $this->getReference(DevOrganisationFixtures::ORGANISATION);
@@ -40,6 +45,7 @@ class DevAnalysisMicroservicesFixtures extends Fixture implements FixtureGroupIn
         $service->setOrganisation($organisation)->setMethod("POST")->setAutoRunForNewArticles(true);
         $service->setPostProcessors([PostProcessorService::STORE_MENTIONED_PEOPLE]);
         $m->persist($service);
+        $this->addReference(self::MENTIONED_PEOPLE, $service);
 
         $service = new AnalysisMicroservice();
         $service->setName("Analyze text complexity")->setEndpoint("http://host.docker.internal:5001/articles")->setIsActive(false);
@@ -47,6 +53,7 @@ class DevAnalysisMicroservicesFixtures extends Fixture implements FixtureGroupIn
         $service->setPostProcessors([PostProcessorService::STORE_TEXT_COMPLEXITY]);
         $m->persist($service);
         $m->flush();
+        $this->addReference(self::TEXT_COMPLEXITY, $service);
 
         $service = new AnalysisMicroservice();
         $service->setName("Analyze topic detection")->setEndpoint("http://host.docker.internal:5002/articles")->setIsActive(false);
@@ -58,6 +65,7 @@ class DevAnalysisMicroservicesFixtures extends Fixture implements FixtureGroupIn
         ]);
         $m->persist($service);
         $m->flush();
+        $this->addReference(self::TOPIC_DETECTION, $service);
 
         $service = new AnalysisMicroservice();
         $service->setName("Sentiment analysis")->setEndpoint("http://host.docker.internal:5003/articles")->setIsActive(true);
@@ -65,5 +73,6 @@ class DevAnalysisMicroservicesFixtures extends Fixture implements FixtureGroupIn
         $service->setPostProcessors([PostProcessorService::STORE_SENTIMENT]);
         $m->persist($service);
         $m->flush();
+        $this->addReference(self::SENTIMENT, $service);
     }
 }

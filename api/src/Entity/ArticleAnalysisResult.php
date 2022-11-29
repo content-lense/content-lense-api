@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use App\Enums\ArticleAnalysisStatus;
 use App\Repository\ArticleAnalysisResultRepository;
@@ -10,10 +12,11 @@ use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\UuidV6;
 
 #[ORM\Entity(repositoryClass: ArticleAnalysisResultRepository::class)]
+#[ApiFilter(SearchFilter::class, properties: ["article"])]
 #[ApiResource]
 class ArticleAnalysisResult
 {
-    
+
     const USER_READ = ["user:articleanalysisresult:collection:get", "user:articleanalysisresult:item:get"];
 
     #[ORM\Id]
@@ -35,7 +38,7 @@ class ArticleAnalysisResult
     #[Groups([...self::USER_READ])]
     private ?Article $article = null;
 
-    #[ORM\Column(type: 'string', enumType: ArticleAnalysisStatus::class)]
+    #[ORM\Column(type: 'string', enumType: ArticleAnalysisStatus::class, options: ["default" => ArticleAnalysisStatus::PUSHED])]
     #[Groups([...self::USER_READ])]
     public ArticleAnalysisStatus $status;
 
@@ -58,7 +61,7 @@ class ArticleAnalysisResult
     #[Groups([...self::USER_READ])]
     public function getAnalysisMicroserviceName(): ?string
     {
-        if($this->analysisMicroservice){
+        if ($this->analysisMicroservice) {
             return $this->analysisMicroservice->getName();
         }
         return null;
