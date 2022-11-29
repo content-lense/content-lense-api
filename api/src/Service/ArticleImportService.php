@@ -50,10 +50,11 @@ class ArticleImportService
         $services = $organisation->getAnalysisMicroservices();
         foreach ($services as $service) {
             $result = new ArticleAnalysisResult();
-            $result->setStatus(ArticleAnalysisStatus::PUSHED)->setArticle($article)->setAnalysisMicroservice($service);
+            
+            $result->setStatus($service->getIsActive() ? ArticleAnalysisStatus::PUSHED : ArticleAnalysisStatus::DISABLED)->setArticle($article)->setAnalysisMicroservice($service);
             $this->em->persist($result);
             $this->em->flush();
-            if ($service->isIsActive() && $service->isAutoRunForNewArticles()) {
+            if ($service->getIsActive() && $service->isAutoRunForNewArticles()) {
                 $this->bus->dispatch(new ApplyAnalysisMicroserviceOnArticleMessage($article->getId(), $service->getId()));
             }
         }

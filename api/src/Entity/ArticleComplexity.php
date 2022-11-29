@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use ApiPlatform\Doctrine\Orm\Filter\RangeFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Serializer\Filter\PropertyFilter;
@@ -16,6 +17,7 @@ use Symfony\Component\Uid\UuidV6;
 #[ApiFilter(RangeFilter::class, properties: ["wienerSachtextIndex", "readingTimeInMinutes", "totalSentences", "totalWords", "totalChars", "meanWordsPerSentence", "meanCharsPerWord"])]
 #[ApiFilter(SearchFilter::class, properties: ['part' => 'exact'])]
 #[ApiFilter(PropertyFilter::class)]
+#[ApiFilter(OrderFilter::class, properties: ['article.title', "wienerSachtextIndex", "readingTimeInMinutes", "totalSentences", "totalWords", "totalChars", "meanWordsPerSentence", "meanCharsPerWord"], arguments: ['orderParameterName' => 'order'])]
 #[ORM\Entity(repositoryClass: ArticleComplexityRepository::class)]
 #[ApiResource]
 class ArticleComplexity

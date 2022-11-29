@@ -3,8 +3,8 @@
 namespace App\MessageHandler;
 
 use App\Entity\ArticleAnalysisResult;
-use App\Entity\ArticleAnalysisStatus;
 use App\Entity\ArticleMention;
+use App\Enums\ArticleAnalysisStatus;
 use App\Message\PostAnalysisProcessorMessage;
 use App\Service\PostProcessorService;
 use Doctrine\ORM\EntityManagerInterface;

@@ -13,6 +13,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\MaxDepth;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ArticleTopicRepository::class)]
@@ -38,6 +39,7 @@ class ArticleTopic
 
     #[ORM\ManyToMany(targetEntity: Article::class, inversedBy: 'articleTopics')]
     #[Groups([...self::USER_READ, ...self::USER_UPDATE])]
+    #[MaxDepth(1)]
     private Collection $articles;
 
     #[ORM\Column(type: Types::SIMPLE_ARRAY, nullable: true)]
