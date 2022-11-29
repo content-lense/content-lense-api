@@ -1,12 +1,15 @@
 <?php
+
 namespace App\DataFixtures;
 
 use App\Entity\Article;
+use App\Entity\ArticleAnalysisResult;
 use App\Entity\ArticleComplexity;
 use App\Entity\ArticleTopic;
 use App\Entity\Organisation;
 use App\Entity\Person;
 use App\Entity\User;
+use App\Enums\ArticleAnalysisStatus;
 use DateTime;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -30,31 +33,40 @@ class DevArticlesFixtures extends Fixture implements FixtureGroupInterface, Depe
             DevOrganisationFixtures::class,
             DevUserFixtures::class,
             DevPersonsFixtures::class,
-            DevArticleTopicsFixtures::class
+            DevArticleTopicsFixtures::class,
+            DevAnalysisMicroservicesFixtures::class
         ];
     }
 
     public function load(ObjectManager $m): void
-    {        
+    {
         $faker = Factory::create();
-       
+
         $persons = $m->getRepository(Person::class)->findAll();
-        for($i = 0; $i<500;$i++){
+        for ($i = 0; $i < 750; $i++) {
             $a = new Article();
-            $a->setAbstract($faker->sentences(1,true))->setLanguage("DE")->setPublishedAt($faker->dateTimeThisCentury())
-            ->setTitle($faker->sentence(8))->setUrl($faker->url())->setVersion(1)->setImage($faker->imageUrl())->setText($faker->paragraphs(3, true));
+            $a->setAbstract($faker->sentences(1, true))->setLanguage("DE")->setPublishedAt($faker->dateTimeThisCentury())->setCreatedAt($faker->dateTimeThisYear())
+                ->setTitle($faker->sentence(8))->setUrl($faker->url())->setVersion(1)->setImage($faker->imageUrl())->setText($faker->paragraphs(3, true));
             $a->setOrganisation($this->getReference(DevOrganisationFixtures::ORGANISATION));
-            $firstAuthor = $persons[array_rand($persons,1)];
+            $firstAuthor = $persons[array_rand($persons, 1)];
             $a->addAuthor($firstAuthor);
-            $secondAuthor = $persons[array_rand($persons,1)];
-            if($faker->boolean() && $firstAuthor !== $secondAuthor){
+            $secondAuthor = $persons[array_rand($persons, 1)];
+            if ($faker->boolean() && $firstAuthor !== $secondAuthor) {
                 $a->addAuthor($secondAuthor);
             }
-            for($k=0;$k<rand(0,3);$k++){
+            for ($k = 0; $k < rand(0, 3); $k++) {
                 $topic = $this->getReference(DevArticleTopicsFixtures::FIXTURE_TOPICS[array_rand(DevArticleTopicsFixtures::FIXTURE_TOPICS)]);
                 $a->addArticleTopic($topic);
             }
-            
+            foreach (DevAnalysisMicroservicesFixtures::MICROSERVICES as $microserviceName) {
+                $microservice = $this->getReference($microserviceName);
+                $articleAnalysisResult = new ArticleAnalysisResult();
+                $articleAnalysisResult->setStatus($microservice->getIsActive() ? ArticleAnalysisStatus::PUSHED : ArticleAnalysisStatus::DISABLED);
+                $articleAnalysisResult->setAnalysisMicroservice($microservice)->setArticle($a)->setRawResult([]);
+                $m->persist($articleAnalysisResult);
+            }
+
+
             $m->persist($a);
         }
         $m->flush();
