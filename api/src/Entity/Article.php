@@ -53,7 +53,7 @@ class Article
     private $id = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups([...self::USER_READ])]
+    #[Groups([...self::USER_READ, ...self::USER_POST])]
     private ?string $url = null;
 
     #[ORM\Column(nullable: true)]
@@ -96,7 +96,7 @@ class Article
     private ?string $abstract = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups([...self::USER_READ])]
+    #[Groups([...self::USER_READ,...self::USER_POST])]
     private ?string $image = null;
 
     #[ORM\ManyToOne(inversedBy: 'articles')]
@@ -124,10 +124,32 @@ class Article
     private Collection $complexities;
 
     #[ORM\ManyToMany(targetEntity: ArticleTopic::class, mappedBy: 'articles')]
+    #[Groups([...self::USER_READ])]
     private Collection $articleTopics;
 
     // #[ORM\OneToMany(mappedBy: 'article', targetEntity: ArticleComplexity::class, orphanRemoval: true)]
     // private Collection $complexities;
+
+
+    public function getRawAuthors(): ?string {
+        return $this->rawAuthors;
+    }
+    #[Groups([...self::USER_POST])]
+    public function setRawAuthors($commaSeparatedAuthors): self {
+        $this->rawAuthors = $commaSeparatedAuthors;
+        return $this;
+    }
+    private string $rawAuthors;
+
+    public function getRawTopics(): ?string {
+        return $this->rawTopics;
+    }
+    #[Groups([...self::USER_POST])]
+    public function setRawTopics($commaSeparatedTopics): self {
+        $this->rawTopics = $commaSeparatedTopics;
+        return $this;
+    }
+    private string $rawTopics;
 
 
     public function __construct()

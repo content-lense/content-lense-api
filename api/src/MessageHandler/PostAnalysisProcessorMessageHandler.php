@@ -10,15 +10,18 @@ use App\Service\PostProcessorService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Messenger\Exception\UnrecoverableMessageHandlingException;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class PostAnalysisProcessorMessageHandler implements MessageHandlerInterface
 {
     private $em;
     private $postProcessor;
-    public function __construct(EntityManagerInterface $em, PostProcessorService $postProcessor)
+    private $clien;
+    public function __construct(EntityManagerInterface $em, PostProcessorService $postProcessor, HttpClientInterface $client)
     {
         $this->em = $em;
         $this->postProcessor = $postProcessor;
+        $this->client = $client;
     }
     
     public function __invoke(PostAnalysisProcessorMessage $message)
@@ -54,6 +57,28 @@ final class PostAnalysisProcessorMessageHandler implements MessageHandlerInterfa
         $result->setStatus(ArticleAnalysisStatus::DONE);
         $this->em->persist($result);
         $this->em->flush();
+
+        // Check for webhooks
+        $organisation = $result->getAnalysisMicroservice()->getOrganisation();
+        if($organisation){
+            $webhooks = $organisation->getWebhooks();
+            if(count($webhooks) > 0) {
+                foreach($webhooks as $webhook){
+                    if(!$webhook->getIsActive()) continue;
+                    $webhook->addLogMessage("Called");
+                    $url = $webhook->getEndpoint();
+                    $res = $this->client->request("POST", $url, [
+                        "headers" => [
+                            "content-type" => "application/json"
+                        ],
+                        "json" => $result->getRawResult()
+                    ]);
+                    $this->em->persist($webhook);
+                }
+                $this->em->flush();
+            }
+        }
+
     }
 }
 

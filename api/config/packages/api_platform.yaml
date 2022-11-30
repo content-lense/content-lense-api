@@ -1,5 +1,10 @@
 api_platform:
     title: Content-Lense API
+    formats:
+        jsonld:   ['application/ld+json']
+        json:     ['application/json']
+        xml:      ['application/xml', 'text/xml']
+        csv:      ['text/csv']
     version: 1.0.0
     mapping:
         paths: ['%kernel.project_dir%/src/Entity']

@@ -26,6 +26,7 @@ class ArticleTopic
     const USER_READ = ["user:articletopic:collection:get", "user:articletopic:item:get"];
     const USER_CREATE = ["user:articletopic:collection:post"];
     const USER_UPDATE = ["user:articletopic:item:put"];
+    const IN_ARTICLE = ["user:article:item:get"];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -33,12 +34,12 @@ class ArticleTopic
     private ?int $id = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups([...self::USER_READ])]
+    #[Groups([...self::USER_READ, ...self::USER_UPDATE, ...self::USER_CREATE, ...self::IN_ARTICLE])]
     #[Assert\NotBlank()]
     private ?string $name = null;
 
     #[ORM\ManyToMany(targetEntity: Article::class, inversedBy: 'articleTopics')]
-    #[Groups([...self::USER_READ, ...self::USER_UPDATE])]
+    #[Groups([...self::USER_UPDATE])]
     #[MaxDepth(1)]
     private Collection $articles;
 

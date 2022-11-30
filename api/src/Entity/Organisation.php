@@ -43,12 +43,16 @@ class Organisation
     #[ORM\OneToMany(mappedBy: 'organisation', targetEntity: ArticleSource::class, orphanRemoval: true)]
     private Collection $articleSources;
 
+    #[ORM\OneToMany(mappedBy: 'organisation', targetEntity: Webhook::class)]
+    private Collection $webhooks;
+
     public function __construct()
     {
         $this->members = new ArrayCollection();
         $this->articles = new ArrayCollection();
         $this->analysisMicroservices = new ArrayCollection();
         $this->articleSources = new ArrayCollection();
+        $this->webhooks = new ArrayCollection();
     }
 
     public function getId(): ?UuidV6
@@ -199,6 +203,36 @@ class Organisation
             // set the owning side to null (unless already changed)
             if ($articleSource->getOrganisation() === $this) {
                 $articleSource->setOrganisation(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Webhook>
+     */
+    public function getWebhooks(): Collection
+    {
+        return $this->webhooks;
+    }
+
+    public function addWebhook(Webhook $webhook): self
+    {
+        if (!$this->webhooks->contains($webhook)) {
+            $this->webhooks->add($webhook);
+            $webhook->setOrganisation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeWebhook(Webhook $webhook): self
+    {
+        if ($this->webhooks->removeElement($webhook)) {
+            // set the owning side to null (unless already changed)
+            if ($webhook->getOrganisation() === $this) {
+                $webhook->setOrganisation(null);
             }
         }
 

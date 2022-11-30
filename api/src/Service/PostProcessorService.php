@@ -82,7 +82,6 @@ class PostProcessorService
         $scores = "scores";
         foreach ($parts as $part) {
             if (array_key_exists($part, $result)) {
-                dump("Store complexity for article " . $article->getId());
                 $articleComplexity = new ArticleComplexity();
                 $articleComplexity->setArticle($article);
                 $articleComplexity->setPart($part);

@@ -32,8 +32,13 @@ class DevWebhookFixtures extends Fixture implements FixtureGroupInterface, Depen
 
     public function load(ObjectManager $m): void
     {        
+        $organisation = $this->getReference(DevOrganisationFixtures::ORGANISATION);
         $service = new Webhook();
-        $service->setName("Forward to wordpress")->setEndpoint("http://test.com/test");
+        $service->setName("Forward to wordpress")
+        ->setEndpoint("https://envup9p51mjxq.x.pipedream.net/")
+        ->setIsActive(true)->setLogs(["Created"])
+        ->setRunOnNewArticle(true)
+        ->setOrganisation($organisation);
         $m->persist($service);
         $m->flush();
     }

@@ -41,14 +41,14 @@ class DevAnalysisMicroservicesFixtures extends Fixture implements FixtureGroupIn
     {
         $organisation = $this->getReference(DevOrganisationFixtures::ORGANISATION);
         $service = new AnalysisMicroservice();
-        $service->setName("Recognize mentioned people")->setEndpoint("http://host.docker.internal:5555/articles")->setIsActive(false);
+        $service->setName("Recognize mentioned people")->setEndpoint("http://host.docker.internal:5000/articles")->setIsActive(true);
         $service->setOrganisation($organisation)->setMethod("POST")->setAutoRunForNewArticles(true);
         $service->setPostProcessors([PostProcessorService::STORE_MENTIONED_PEOPLE]);
         $m->persist($service);
         $this->addReference(self::MENTIONED_PEOPLE, $service);
 
         $service = new AnalysisMicroservice();
-        $service->setName("Analyze text complexity")->setEndpoint("http://host.docker.internal:5001/articles")->setIsActive(false);
+        $service->setName("Analyze text complexity")->setEndpoint("http://host.docker.internal:5001/articles")->setIsActive(true);
         $service->setOrganisation($organisation)->setMethod("POST")->setAutoRunForNewArticles(true);
         $service->setPostProcessors([PostProcessorService::STORE_TEXT_COMPLEXITY]);
         $m->persist($service);
@@ -56,7 +56,7 @@ class DevAnalysisMicroservicesFixtures extends Fixture implements FixtureGroupIn
         $this->addReference(self::TEXT_COMPLEXITY, $service);
 
         $service = new AnalysisMicroservice();
-        $service->setName("Analyze topic detection")->setEndpoint("http://host.docker.internal:5002/articles")->setIsActive(false);
+        $service->setName("Analyze topic detection")->setEndpoint("http://host.docker.internal:5002/articles")->setIsActive(true);
         $service->setOrganisation($organisation)->setMethod("POST")->setAutoRunForNewArticles(true);
         $service->setPostProcessors([PostProcessorService::STORE_TOPIC_DETECTION]);
         $service->setAdditionalPayload([

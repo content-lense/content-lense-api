@@ -25,20 +25,31 @@ class Webhook
     private ?int $id = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups([...self::ADMIN_READ])]
+    #[Groups([...self::ADMIN_READ,...self::ADMIN_CREATE,...self::ADMIN_UPDATE])]
     private ?bool $runOnNewArticle = null;
 
     #[ORM\ManyToMany(targetEntity: AnalysisMicroservice::class, inversedBy: 'webhooks')]
-    #[Groups([...self::ADMIN_READ])]
+    #[Groups([...self::ADMIN_READ,...self::ADMIN_CREATE,...self::ADMIN_UPDATE])]
     private Collection $runAfterAnalyses;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups([...self::ADMIN_READ])]
+    #[Groups([...self::ADMIN_READ,...self::ADMIN_CREATE,...self::ADMIN_UPDATE])]
     private ?string $endpoint = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups([...self::ADMIN_READ])]
+    #[Groups([...self::ADMIN_READ,...self::ADMIN_CREATE,...self::ADMIN_UPDATE])]
     private ?string $name = null;
+
+    #[ORM\Column(type: Types::SIMPLE_ARRAY, nullable: true)]
+    #[Groups([...self::ADMIN_READ,...self::ADMIN_CREATE,...self::ADMIN_UPDATE])]
+    private array $logs = [];
+
+    #[ORM\ManyToOne(inversedBy: 'webhooks')]
+    private ?Organisation $organisation = null;
+
+    #[ORM\Column(nullable: true)]
+    #[Groups([...self::ADMIN_READ,...self::ADMIN_CREATE,...self::ADMIN_UPDATE])]
+    private ?bool $isActive = null;
 
     public function __construct()
     {
@@ -106,6 +117,48 @@ class Webhook
     public function setName(?string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getLogs(): array
+    {
+        return $this->logs;
+    }
+
+    public function addLogMessage(string $message): self
+    {
+        $this->logs[] = $message;
+
+        return $this;
+    }
+    public function setLogs(?array $logs): self
+    {
+        $this->logs = $logs;
+
+        return $this;
+    }
+
+    public function getOrganisation(): ?Organisation
+    {
+        return $this->organisation;
+    }
+
+    public function setOrganisation(?Organisation $organisation): self
+    {
+        $this->organisation = $organisation;
+
+        return $this;
+    }
+
+    public function getIsActive(): ?bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(?bool $isActive): self
+    {
+        $this->isActive = $isActive;
 
         return $this;
     }

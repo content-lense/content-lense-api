@@ -19,7 +19,19 @@ class ArticleComplexityBoundaryController extends AbstractController
 
     function buildQuery(string $field, string $order)
     {
-        return floatval($this->em->createQueryBuilder()->select('a.' . $field)->from(ArticleComplexity::class, 'a')->orderBy('a.' . $field, $order)->setMaxResults(1)->getQuery()->getSingleColumnResult()[0]);
+        $val = $this->em->createQueryBuilder()
+            ->select('a.' . $field)
+            ->from(ArticleComplexity::class, 'a')
+            ->orderBy('a.' . $field, $order)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getSingleColumnResult();
+        if(count($val) > 0){
+            $val = $val[0];
+        }else{
+            $val = 0;
+        }
+        return floatval($val);
     }
 
     #[Route('/article_complexity/boundary', name: 'app_article_complexity_boundary')]

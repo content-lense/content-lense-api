@@ -33,7 +33,6 @@ class ArticleTopicVennDataController extends AbstractController
         $query = "SELECT a0_.id AS article_topic_id, a0_.name, (SELECT COUNT(*) FROM article_topic_article a1_ WHERE a1_.article_topic_id = a0_.id) AS number_of_articles FROM article_topic a0_ ORDER BY number_of_articles DESC LIMIT :limit";
         $stmt = $em->getConnection()->prepare($query);
         $articleTopics = $stmt->executeQuery(["limit" => $limit])->fetchAllAssociativeIndexed();
-        dump($articleTopics);
         $ids = [];
         $returnObj = [];
         $topics = [];
