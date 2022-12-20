@@ -17,7 +17,7 @@ class Webhook
 
     const ADMIN_READ = ["admin:webhook:collection:get", "admin:webhook:item:get"];
     const ADMIN_UPDATE = ["admin:webhook:item:put"];
-    const ADMIN_CREATE = ["admin:webhook:collection:post"];
+    const ADMIN_CREATE = ["admin:webhook:collection:post","admin:webhook:item:post"];
 
     #[ORM\Id]
     #[ORM\GeneratedValue]

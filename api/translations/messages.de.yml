@@ -1,0 +1,41 @@
+copyOf: "Kopie von"
+emails:
+    Hi: "Hallo"
+    anonymousGreeting: "Guten Tag!"
+    anonymousGoodbye: "Beste Grüße"
+    footer: "easyclipr GmbH, 2022"
+    confirmRegistration:
+        subject: Herzlich Willkommen
+        text: Herzlich willkommen! Wir freuen uns sehr, dass Du Dich bei skillports registriert hast. Bitte bestätige Dein Konto, um die Registrierung abzuschließen und mit der Erstellung von Inhalten zu beginnen.
+        cta: Bestätigen
+    resetPassword:
+        subject: Dein Passwort
+        text: Wir haben eine Anfrage erhalten, Dein Passwort zurückzusetzen. Wenn Du das nicht selbst warst, ignorieren diese E-Mail bitte.
+        cta: Passwort zurücksetzen
+    newOrganisation:
+        subject: Willkommen bei skillports
+        text: |
+            heute ist ein aufregender Tag: Vielen Dank, dass Du Dich bei skillports registriert hast - willkommen an Bord!<br /><br />
+            Lege direkt los:<br /><br />
+            <ol>
+            <li>Aktiviere Deinen Account</li>
+            <li>Lade Deine Kollegen ein</li>
+            <li>Lege Deine ersten Kunden und Zielgruppen an</li>
+            <li>Erstelle Deinen ersten Kurs</li>
+            </ol><br />
+            <br />
+            Wir freuen uns sehr, Dich bei skillports begrüßen zu dürfen!
+        cta: Aktivieren
+    inviteToOrganisation:
+        subject: Du wurdest eingeladen, skillports beizutreten
+        text: |
+            %name% hat Dich eingeladen, der Organisation %organisationName% bei skillports beizutreten – herzlich willkommen!<br /><br />
+            Lege direkt los:<br /><br />
+            <ol>
+            <li>Aktiviere Deinen Account</li>
+            <li>Erstelle Kunden und Zielgruppen</li>
+            <li>Bearbeite Kursinhalte</li>
+            </ol><br />
+            <br />
+            Wir freuen uns sehr, Dich bei skillports begrüßen zu dürfen!
+        cta: Aktivieren

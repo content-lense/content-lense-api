@@ -25,6 +25,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use App\State\UserProcessor;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -45,6 +46,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             uriTemplate: "/users/{id}/confirm"
         ),
         new Put(
+            processor: UserProcessor::class,
             uriTemplate: "/users/{id}/reset",
             security: "is_granted('ROLE_ADMIN') or is_granted('PATCH_USER', object)",
             validationContext: [
@@ -55,11 +57,12 @@ use Symfony\Component\Validator\Constraints as Assert;
             security: "is_granted('ROLE_USER')"
         ),
         new Post(
+            processor: UserProcessor::class,
             validationContext: [
                 "groups" => ["Default", "registration"]
-            ]
+            ],
         ),
-    ]
+    ],
 )]
 #[ORM\HasLifecycleCallbacks]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -72,7 +75,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     const OWNER_READ = ["me", "owner:user:collection:post"];
     const OWNER_UPDATE = ["owner:user:item:put"];
     const REGISTERATION = ["anon:user:collection:post", "anon:user:item:get"];
-    
+    const RESETPASSWORD = ["anon:user:item:put"];
+
     #[ORM\PreUpdate]
     #[ORM\PrePersist]
     public function updateTimestamps(): void
@@ -88,18 +92,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->roles = [];
         $this->organisations = new ArrayCollection();
-        $this->ownedOrganisation = new ArrayCollection();
+        $this->ownedOrganisations = new ArrayCollection();
     }
+
     #[ORM\Id]
     #[ORM\GeneratedValue("CUSTOM")]
     #[ORM\CustomIdGenerator("doctrine.uuid_generator")]
     #[ORM\Column(type: 'uuid', unique: true)]
-    #[Groups(["me", ...self::ADMIN_READ,  ...self::OWNER_READ ])]
+    #[Groups(["me", ...self::ADMIN_READ,  ...self::OWNER_READ])]
     private $id;
 
     #[ORM\Column(type: 'text', unique: true)]
     #[Assert\Email()]
-    #[Groups(["me", ...self::ADMIN_READ, ...self::OWNER_UPDATE, ...self::ADMIN_CREATE, ...self::ADMIN_UPDATE, ...self::REGISTERATION, ...self::OWNER_READ ])]
+    #[Groups(["me", ...self::ADMIN_READ, ...self::OWNER_UPDATE, ...self::ADMIN_CREATE, ...self::ADMIN_UPDATE, ...self::REGISTERATION, ...self::OWNER_READ])]
     #[MaxDepth(1)]
     private $email;
 
@@ -121,20 +126,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * Will not be persisted to doctrine, this is just for encoding the password
      */
     #[SerializedName("password")]
-    #[Groups(["anon:user:collection:post", "admin:user:collection:post", "admin:user:item:put", "anon:user:item:reset_password"])]
+    #[Groups(["anon:user:collection:post", "admin:user:collection:post", "admin:user:item:put", "anon:user:item:reset_password", ...self::RESETPASSWORD])]
     #[Assert\Length(min: 8)]
     #[Assert\NotBlank(groups: ["registration", "reset_password"])]
     private $plainPassword;
 
 
-    #[Groups([...self::REGISTERATION, "admin:user:collection:post", "admin:user:item:put", "anon:user:item:reset_password"])]
+    #[Groups([...self::REGISTERATION, "admin:user:collection:post", "admin:user:item:put", "anon:user:item:reset_password",...self::RESETPASSWORD])]
     #[Assert\Length(min: 8)]
     #[Assert\NotBlank(groups: ["registration", "reset_password"])]
     private $repeatPassword;
 
 
     #[ORM\Column(type: 'boolean', nullable: true)]
-    #[Groups(["me", ...self::REGISTERATION, ...self::ADMIN_READ, ...self::ADMIN_UPDATE, ])]
+    #[Groups(["me", ...self::REGISTERATION, ...self::ADMIN_READ, ...self::ADMIN_UPDATE,])]
     private $isConfirmed;
 
     #[ORM\Column(type: 'text', nullable: true)]
@@ -167,7 +172,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $organisations;
 
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Organisation::class)]
-    private Collection $ownedOrganisation;
+    #[Groups(["me", ...self::ADMIN_READ])]
+    private Collection $ownedOrganisations;
 
     public function getUserIdentifier(): string
     {
@@ -412,15 +418,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return Collection<int, Organisation>
      */
-    public function getOwnedOrganisation(): Collection
+    public function getOwnedOrganisations(): Collection
     {
-        return $this->ownedOrganisation;
+        return $this->ownedOrganisations;
     }
 
     public function addOwnedOrganisation(Organisation $ownedOrganisation): self
     {
-        if (!$this->ownedOrganisation->contains($ownedOrganisation)) {
-            $this->ownedOrganisation->add($ownedOrganisation);
+        if (!$this->ownedOrganisations->contains($ownedOrganisation)) {
+            $this->ownedOrganisations->add($ownedOrganisation);
             $ownedOrganisation->setOwner($this);
         }
 
@@ -429,7 +435,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function removeOwnedOrganisation(Organisation $ownedOrganisation): self
     {
-        if ($this->ownedOrganisation->removeElement($ownedOrganisation)) {
+        if ($this->ownedOrganisations->removeElement($ownedOrganisation)) {
             // set the owning side to null (unless already changed)
             if ($ownedOrganisation->getOwner() === $this) {
                 $ownedOrganisation->setOwner(null);
@@ -438,6 +444,4 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-
-
 }

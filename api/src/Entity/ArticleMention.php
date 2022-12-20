@@ -9,6 +9,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ArticleMentionRepository::class)]
 #[ApiResource]
+#[ORM\HasLifecycleCallbacks]
 class ArticleMention
 {
     const IN_ARTICLE = ["user:article:collection:get", "user:article:item:get"];
@@ -43,7 +44,6 @@ class ArticleMention
     public function setPerson(?Person $person): self
     {
         $this->person = $person;
-
         return $this;
     }
 
@@ -55,7 +55,6 @@ class ArticleMention
     public function setArticle(?Article $article): self
     {
         $this->article = $article;
-
         return $this;
     }
 

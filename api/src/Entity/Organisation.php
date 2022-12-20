@@ -3,18 +3,42 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use App\Controller\RefreshApiTokenController;
 use App\Repository\OrganisationRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Uid\UuidV6;
 
 #[ORM\Entity(repositoryClass: OrganisationRepository::class)]
-#[ApiResource]
+#[ApiResource(operations: [
+    new Put(
+        name: 'refreshApiToken', 
+        security: "is_granted('ROLE_ADMIN')",
+        uriTemplate: '/organisations/{id}/refresh-api-token', 
+        controller: RefreshApiTokenController::class,
+        normalizationContext: [
+            "groups" => ["refresh_api_token"]
+        ],
+        denormalizationContext: [
+            "groups" => ["refresh_api_token"]
+        ]
+    ),
+    new Get(),
+    new Post(),
+])]
 class Organisation
 {
+
+    const ADMIN_READ = ["admin:organisation:item:get"];
+    const ADMIN_UPDATE = ["admin:organisation:item:put"];
+   
     #[ORM\Id]
     #[ORM\GeneratedValue("CUSTOM")]
     #[ORM\CustomIdGenerator("doctrine.uuid_generator")]
@@ -32,6 +56,7 @@ class Organisation
     private ?User $owner = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true, unique: true)]
+    #[Groups([...self::ADMIN_READ, "refresh_api_token"])]
     private ?string $apiToken = null;
 
     #[ORM\OneToMany(mappedBy: 'organisation', targetEntity: Article::class)]
@@ -116,6 +141,12 @@ class Organisation
     {
         $this->apiToken = $apiToken;
 
+        return $this;
+    }
+
+    public function refreshApiToken(): self
+    {
+        $this->setApiToken(md5(random_bytes(10)));
         return $this;
     }
 

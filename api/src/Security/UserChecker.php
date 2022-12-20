@@ -13,12 +13,12 @@ class UserChecker implements UserCheckerInterface {
             return;
         }
         
-        if (!$user->getIsConfirmed()) {
+        /*if (!$user->getIsConfirmed()) {
             // the message passed to this exception is meant to be displayed to the user
             throw new CustomUserMessageAccountStatusException(
                 "Your account has not yet been confirmed. Please follow the link in the email that we sent you."
             );
-        }
+        }*/
 
         if (!$user->getIsActive()) {
             // the message passed to this exception is meant to be displayed to the user

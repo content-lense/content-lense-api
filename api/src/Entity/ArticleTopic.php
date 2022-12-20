@@ -15,9 +15,13 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Serializer\Annotation\MaxDepth;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Filter\MultipleFieldSearchFilter;
 
 #[ORM\Entity(repositoryClass: ArticleTopicRepository::class)]
 #[ApiFilter(OrderFilter::class, properties: ['name'])]
+#[ApiFilter(MultipleFieldSearchFilter::class, properties: [
+    "name"
+])]
 #[ApiFilter(CountFilter::class, properties: ['articles'])]
 #[ApiFilter(PropertyFilter::class)]
 #[ApiResource]

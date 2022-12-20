@@ -18,6 +18,16 @@ services:
     volumes:
       - ./api/docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
       - ./api/public:/srv/api/public:ro
+  
+  mailhog:
+    image: mailhog/mailhog
+    #logging:
+    #  driver: 'local'  # disable saving logs
+    ports:
+      - 1025:1025 # smtp server
+      - 8025:8025 # web ui
+    env_file:
+      - .env.mailhog
 
 ###> doctrine/doctrine-bundle ###
   database:

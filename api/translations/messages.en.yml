@@ -1,0 +1,40 @@
+copyOf: "Copy of"
+emails:
+    Hi: "Hi"
+    anonymousGreeting: "Hi there!"
+    anonymousGoodbye: "Goodbye!"
+    footer: "easyclipr GmbH, 2022"
+    confirmRegistration:
+        subject: Welcome
+        text: Welcome! We are very pleased that you have registered with skillports. Please confirm your account to complete your registration and start creating content.
+        cta: Confirm
+    resetPassword:
+        subject: Your password
+        text: We received a request to reset your password. If it wasn't you, please just ignore this email.
+        cta: Reset password
+    newOrganisation:
+        subject: Welcome to skillports
+        text: |
+            Today is an exciting day: massive thanks for joining skillports – welcome aboard!<br /><br />Now it's time to set up your account so you can get started on uplifting your company – and yourself!<br /><br />
+            To get started:<br /><br />
+            <ol>
+            <li>Activate your account by clicking the button below.</li>
+            <li>Complete your personal profile.</li>
+            <li>See what skillports has to offer you!</li>
+            </ol><br />
+            <br />
+            We are thrilled to have you at skillports!
+        cta: "Activate your account"
+    inviteToOrganisation:
+        subject: You've been invited to join skillports
+        text: |
+            %name% has invited you to join skillports and their organisation %organisationName% – welcome aboard!<br /><br />Now it's time to set up your account so you can get started and join the organisation!<br /><br />
+            To get started:<br /><br />
+            <ol>
+            <li>Activate your account by clicking the button below and setting your password.</li>
+            <li>Complete your personal profile.</li>
+            <li>See what skillports has to offer!</li>
+            </ol><br />
+            <br />
+            We are thrilled to have you at skillports!
+        cta: "Activate your account"

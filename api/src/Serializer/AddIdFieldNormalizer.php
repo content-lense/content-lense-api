@@ -1,8 +1,10 @@
 <?php
+
 namespace App\Serializer;
 
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Paginator;
 use ApiPlatform\Core\Metadata\Resource\Factory\ResourceMetadataFactoryInterface;
+use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Resource\Factory\ResourceMetadataCollectionFactoryInterface;
 use ApiPlatform\Metadata\Resource\ResourceMetadataCollection;
@@ -25,28 +27,31 @@ class AddIdFieldNormalizer implements NormalizerInterface, NormalizerAwareInterf
     }
 
     private function addId($item){
+        // TODO: instead of exploding by slash, we should rather get the URI template and get the id parameter
+        // otherwise, the id will always be set to the last part of the url, event though it might be a subroute (e.g. /organisations/<id>/refres-token)
         if(array_key_exists("@id", $item)){
             $tmp = explode("/",$item["@id"]);
             $item["id"] = end($tmp);
-            if(intval($item["id"]) == $item["id"]){
+            if (intval($item["id"]) == $item["id"]) {
                 $item["id"] = intval($item["id"]);
-            }    
+            }
         }
         return $item;
     }
+
     public function normalize($object, $format = null, array $context = []): array|string|int|float|bool|\ArrayObject|null
     {
 
         $context[self::ALREADY_CALLED] = true;
         $data = $this->normalizer->normalize($object, $format, $context);
-        
-        if(array_key_exists("operation",$context)){
+
+        if (array_key_exists("operation", $context)) {
             $operation = $context["operation"];
-            if($operation instanceof GetCollection){
-                if($format === "jsonld" && array_key_exists("hydra:member", $data)){
-                    $data["hydra:member"] = array_map(fn($item) => $this->addId($item), $data["hydra:member"] );
+            if ($operation instanceof GetCollection) {
+                if ($format === "jsonld" && array_key_exists("hydra:member", $data)) {
+                    $data["hydra:member"] = array_map(fn ($item) => $this->addId($item), $data["hydra:member"]);
                 }
-            }else{
+            }else if(!$operation instanceof Delete){
                 if($format === "jsonld" ){
                     $data = $this->addId($data);
                 }
@@ -63,5 +68,4 @@ class AddIdFieldNormalizer implements NormalizerInterface, NormalizerAwareInterf
         }
         return true;
     }
-
 }

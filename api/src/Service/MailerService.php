@@ -66,7 +66,7 @@ class MailerService
             $this->translator->trans("emails.confirmRegistration.subject"),
             $this->translator->trans("emails.confirmRegistration.text"),
             $this->translator->trans("emails.confirmRegistration.cta"),
-            $_SERVER['FRONTEND_ADDRESS']."/confirm-account?url=".urlencode($this->urlGenerator->generate("api_users_confirm_item",["id" => $user->getId()], UrlGenerator::ABSOLUTE_PATH))
+            $_SERVER['FRONTEND_ADDRESS']."/confirm-account?url=".urlencode($this->urlGenerator->generate("confirm_signup",["id" => $user->getId()], UrlGenerator::ABSOLUTE_PATH))
         );
         $this->mailer->send($email);
     }
@@ -84,23 +84,6 @@ class MailerService
             $this->translator->trans("emails.resetPassword.text"),
             $this->translator->trans("emails.resetPassword.cta"),
             $_SERVER['FRONTEND_ADDRESS']."/set-new-password?id=".$user->getId()."&token=".$user->getResetPasswordToken()
-        );
-        $this->mailer->send($email);
-    }
-
-    public function sendInviteTrainerToOrganisationMail(User $user, User $invitedBy, Organisation $organisation)
-    {
-        $user->setResetPasswordToken(md5(random_bytes(16)));
-        $this->em->persist($user);
-        $this->em->flush();
-        $passwdResetUrl = $_SERVER['FRONTEND_ADDRESS']."/set-new-password?id=".$user->getId()."&token=".$user->getResetPasswordToken();
-        $email = $this->createTemplatedEmail(
-            $user->getEmail(), 
-            $this->translator->trans("emails.inviteToOrganisation.subject"),
-            $this->translator->trans("emails.inviteToOrganisation.text",['%name%'=>$invitedBy->getDisplayName(), '%organisationName%' => $organisation->getName()]),
-            $this->translator->trans("emails.inviteToOrganisation.cta"),
-            $passwdResetUrl,
-            $this->createGreetingForUser($user)
         );
         $this->mailer->send($email);
     }
@@ -124,11 +107,7 @@ class MailerService
     }
 
     public function createGreetingForUser(User $user) {
-        if ($user->getFirstName()) {
-            return $this->translator->trans("Hi") ." ". $user->getFirstName() . ", ";
-        } else {
-            return $this->translator->trans("anonymousGreeting");
-        }
+        return $this->translator->trans("anonymousGreeting");
     }
 
 

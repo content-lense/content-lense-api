@@ -20,14 +20,14 @@ use Symfony\Component\Uid\UuidV6;
 
 #[ORM\Entity(repositoryClass: ArticleRepository::class)]
 #[ORM\HasLifecycleCallbacks]
-#[ApiFilter(SearchFilter::class, properties: ['id' => 'exact', 'title' => 'ipartial'])]
+#[ApiFilter(SearchFilter::class, properties: ['id' => 'exact', 'title' => 'ipartial', 'articleTopics.id' => 'exact', 'sentimentOfText' => 'exact'])]
 #[ApiFilter(MultipleFieldSearchFilter::class, properties: [
     "title", "text", "abstract", "authors.firstName", "authors.lastName"
 ])]
 #[ApiFilter(Datefilter::class, properties: ["createdAt"])]
 #[ApiFilter(OrderFilter::class, properties: ["createdAt"], arguments: ['orderParameterName' => 'order'])]
 #[ApiFilter(PropertyFilter::class)]
-#[ApiResource(processor: ArticleProcessor::class, order:["createdAt" => "desc"])]
+#[ApiResource(processor: ArticleProcessor::class, order: ["createdAt" => "desc"])]
 class Article
 {
     const USER_READ = ["user:article:collection:get", "user:article:item:get", "user:articletopic:item:get", "user:articletopic:collection:get"];
@@ -59,7 +59,7 @@ class Article
     #[ORM\Column(nullable: true)]
     #[Groups([...self::USER_READ])]
     private ?int $version = null;
-    
+
     #[ORM\Column(nullable: true)]
     #[Groups([...self::USER_READ])]
     private ?int $sentimentOfHeading = null;
@@ -96,7 +96,7 @@ class Article
     private ?string $abstract = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups([...self::USER_READ,...self::USER_POST])]
+    #[Groups([...self::USER_READ, ...self::USER_POST])]
     private ?string $image = null;
 
     #[ORM\ManyToOne(inversedBy: 'articles')]
@@ -131,21 +131,25 @@ class Article
     // private Collection $complexities;
 
 
-    public function getRawAuthors(): ?string {
+    public function getRawAuthors(): ?string
+    {
         return $this->rawAuthors;
     }
     #[Groups([...self::USER_POST])]
-    public function setRawAuthors($commaSeparatedAuthors): self {
+    public function setRawAuthors($commaSeparatedAuthors): self
+    {
         $this->rawAuthors = $commaSeparatedAuthors;
         return $this;
     }
     private string $rawAuthors;
 
-    public function getRawTopics(): ?string {
+    public function getRawTopics(): ?string
+    {
         return $this->rawTopics;
     }
     #[Groups([...self::USER_POST])]
-    public function setRawTopics($commaSeparatedTopics): self {
+    public function setRawTopics($commaSeparatedTopics): self
+    {
         $this->rawTopics = $commaSeparatedTopics;
         return $this;
     }
@@ -334,8 +338,9 @@ class Article
     {
         if (!$this->authors->contains($author)) {
             $this->authors->add($author);
+            $author->addArticle($this);
         }
-
+ 
         return $this;
     }
 

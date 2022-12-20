@@ -1,22 +1,23 @@
 api_platform:
-    title: Content-Lense API
-    formats:
-        jsonld:   ['application/ld+json']
-        json:     ['application/json']
-        xml:      ['application/xml', 'text/xml']
-        csv:      ['text/csv']
-    version: 1.0.0
-    mapping:
-        paths: ['%kernel.project_dir%/src/Entity']
-    patch_formats:
-        json: ['application/merge-patch+json']
-    swagger:
-        versions: [3]
-    show_webby: false
-    # Good cache defaults for REST APIs
-    defaults:
-        stateless: true
-        cache_headers:
-            vary: ['Content-Type', 'Authorization', 'Origin']
-        pagination_items_per_page: 100
-        pagination_client_items_per_page: true
+  title: Content-Lense API
+  formats:
+    jsonld: ["application/ld+json"]
+    json: ["application/json"]
+    xml: ["application/xml", "text/xml"]
+    csv: ["text/csv"]
+    html: ["text/html"]
+  version: 1.0.0
+  mapping:
+    paths: ["%kernel.project_dir%/src/Entity"]
+  patch_formats:
+    json: ["application/merge-patch+json"]
+  swagger:
+    versions: [3]
+  show_webby: false
+  # Good cache defaults for REST APIs
+  defaults:
+    stateless: true
+    cache_headers:
+      vary: ["Content-Type", "Authorization", "Origin"]
+    pagination_items_per_page: 100
+    pagination_client_items_per_page: true

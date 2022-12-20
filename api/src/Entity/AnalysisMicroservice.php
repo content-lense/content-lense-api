@@ -18,7 +18,7 @@ class AnalysisMicroservice
     const ADMIN_READ = ["admin:analysismicroservice:collection:get", "admin:analysismicroservice:item:get"];
     const ADMIN_UPDATE = ["admin:analysismicroservice:item:put"];
     const ADMIN_CREATE = ["admin:analysismicroservice:collection:post"];
-    
+
     #[ORM\Id]
     #[ORM\GeneratedValue("CUSTOM")]
     #[ORM\CustomIdGenerator("doctrine.uuid_generator")]
@@ -26,11 +26,11 @@ class AnalysisMicroservice
     private $id = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups([...self::ADMIN_READ])]
+    #[Groups([...self::ADMIN_READ, ...self::ADMIN_UPDATE])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups([...self::ADMIN_READ])]
+    #[Groups([...self::ADMIN_READ, ...self::ADMIN_UPDATE])]
     private ?string $endpoint = null;
 
     #[ORM\ManyToOne(inversedBy: 'analysisMicroservices')]
@@ -47,7 +47,7 @@ class AnalysisMicroservice
     private array $headers = [];
 
     #[ORM\Column]
-    #[Groups([...self::ADMIN_READ])]
+    #[Groups([...self::ADMIN_READ, ...self::ADMIN_UPDATE])]
     private ?bool $isActive = null;
 
     #[ORM\Column(nullable: true)]

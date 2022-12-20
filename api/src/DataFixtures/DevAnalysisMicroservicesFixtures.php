@@ -39,16 +39,19 @@ class DevAnalysisMicroservicesFixtures extends Fixture implements FixtureGroupIn
     const MICROSERVICES = [self::MENTIONED_PEOPLE, self::TEXT_COMPLEXITY, self::SENTIMENT, self::TOPIC_DETECTION];
     public function load(ObjectManager $m): void
     {
+
+        $host = "host.docker.internal";
+        //$host = "cl.cloud-creators.de";
         $organisation = $this->getReference(DevOrganisationFixtures::ORGANISATION);
         $service = new AnalysisMicroservice();
-        $service->setName("Recognize mentioned people")->setEndpoint("http://host.docker.internal:5000/articles")->setIsActive(true);
+        $service->setName("Recognize mentioned people")->setEndpoint("http://".$host.":5000/articles")->setIsActive(true);
         $service->setOrganisation($organisation)->setMethod("POST")->setAutoRunForNewArticles(true);
         $service->setPostProcessors([PostProcessorService::STORE_MENTIONED_PEOPLE]);
         $m->persist($service);
         $this->addReference(self::MENTIONED_PEOPLE, $service);
 
         $service = new AnalysisMicroservice();
-        $service->setName("Analyze text complexity")->setEndpoint("http://host.docker.internal:5001/articles")->setIsActive(true);
+        $service->setName("Analyze text complexity")->setEndpoint("http://".$host.":5001/articles")->setIsActive(true);
         $service->setOrganisation($organisation)->setMethod("POST")->setAutoRunForNewArticles(true);
         $service->setPostProcessors([PostProcessorService::STORE_TEXT_COMPLEXITY]);
         $m->persist($service);
@@ -56,7 +59,7 @@ class DevAnalysisMicroservicesFixtures extends Fixture implements FixtureGroupIn
         $this->addReference(self::TEXT_COMPLEXITY, $service);
 
         $service = new AnalysisMicroservice();
-        $service->setName("Analyze topic detection")->setEndpoint("http://host.docker.internal:5002/articles")->setIsActive(true);
+        $service->setName("Analyze topic detection")->setEndpoint("http://".$host.":5002/articles")->setIsActive(true);
         $service->setOrganisation($organisation)->setMethod("POST")->setAutoRunForNewArticles(true);
         $service->setPostProcessors([PostProcessorService::STORE_TOPIC_DETECTION]);
         $service->setAdditionalPayload([
@@ -68,7 +71,7 @@ class DevAnalysisMicroservicesFixtures extends Fixture implements FixtureGroupIn
         $this->addReference(self::TOPIC_DETECTION, $service);
 
         $service = new AnalysisMicroservice();
-        $service->setName("Sentiment analysis")->setEndpoint("http://host.docker.internal:5003/articles")->setIsActive(true);
+        $service->setName("Sentiment analysis")->setEndpoint("http://".$host.":5003/articles")->setIsActive(true);
         $service->setOrganisation($organisation)->setMethod("POST")->setAutoRunForNewArticles(true);
         $service->setPostProcessors([PostProcessorService::STORE_SENTIMENT]);
         $m->persist($service);
